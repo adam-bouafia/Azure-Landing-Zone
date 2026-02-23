@@ -1,24 +1,10 @@
 # ALZ
 
-A production Azure Landing Zone for a fictional managed services client, built entirely in Bicep and deployed through Azure DevOps. This project simulates the infrastructure that an Azure Dev delivers when onboarding a new enterprise client.
+A production Azure Landing Zone for a fictional managed services client, built entirely in Bicep and deployed through Azure DevOps. This project simulates the infrastructure that an Azure Expert MSP delivers for enterprise client.
 
 ---
 
-## Ⅰ. Tech Stack
-
-Before diving into what we built, here's the tooling and why each was chosen:
-
-| Tool                          | What it is                                                                                                                                            | Why we use it                                                                                                                                        |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Bicep**                     | Azure's native Infrastructure as Code language. It compiles to ARM templates but is 10x more readable. You write `.bicep` files that describe what Azure resources you want, and Azure creates them. | Azure-native, no state file (unlike Terraform), first-class VS Code support.
-| **Azure CLI**                 | Command-line tool to manage Azure. `az deployment sub create` deploys our Bicep. `az vm show` inspects resources.                                     | Needed for deployments, scripting, and pipeline tasks.                                                                                               |
-| **Azure DevOps**              | Microsoft's CI/CD platform. Hosts our git repo, runs our pipelines, manages approvals.                                                                | Our example lives in the Microsoft ecosystem. Not GitHub, Azure DevOps is where their teams work.                                                       |
-| **PowerShell 7**              | Scripting language with the `Az` module for Azure automation.                                                                                         | Operational scripts for auditing and cost management. Standard tool for Windows-heavy Azure environments.                                            |
-| **KQL (Kusto Query Language)**| SQL-like language for querying Log Analytics. `Perf \| where CounterName == "% Processor Time"` finds high-CPU VMs.                                   | Used daily for 3rd-line support to investigate incidents.                                                                                   |
-
----
-
-## Ⅱ. What We Provides in our Mock-Project
+## I. What We Provides in our Mock-Project
 
 ### 1. Hub-spoke network topology
 
@@ -223,3 +209,21 @@ Stage 5: DEPLOY (prod) ← PAUSES HERE
 ```
 
 The approval gate on prod is critical. You never deploy to production without a human reviewing what's about to change. This is how we prevents "oops I deleted the client's firewall" incidents.
+
+---
+
+
+## II. Tech Stack
+
+Before diving into what we built, here's the tooling and why each was chosen:
+
+| Tool                          | What it is                                                                                                                                            | Why we use it                                                                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bicep**                     | Azure's native Infrastructure as Code language. It compiles to ARM templates but is 10x more readable. You write `.bicep` files that describe what Azure resources you want, and Azure creates them. | Azure-native, no state file (unlike Terraform), first-class VS Code support.
+| **Azure CLI**                 | Command-line tool to manage Azure. `az deployment sub create` deploys our Bicep. `az vm show` inspects resources.                                     | Needed for deployments, scripting, and pipeline tasks.                                                                                               |
+| **Azure DevOps**              | Microsoft's CI/CD platform. Hosts our git repo, runs our pipelines, manages approvals.                                                                | Our example lives in the Microsoft ecosystem. Not GitHub, Azure DevOps is where their teams work.                                                       |
+| **PowerShell 7**              | Scripting language with the `Az` module for Azure automation.                                                                                         | Operational scripts for auditing and cost management. Standard tool for Windows-heavy Azure environments.                                            |
+| **KQL (Kusto Query Language)**| SQL-like language for querying Log Analytics. `Perf \| where CounterName == "% Processor Time"` finds high-CPU VMs.                                   | Used daily for 3rd-line support to investigate incidents.                                                                                   |
+
+---
+
