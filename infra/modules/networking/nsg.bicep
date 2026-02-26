@@ -32,8 +32,7 @@
 //     brand new NSG.
 //
 // IMPORTANT CONSTRAINTS:
-//   - AzureFirewallSubnet: CANNOT have a user-assigned NSG. Azure manages it.
-//   - AzureBastionSubnet: CANNOT have a user-assigned NSG. Azure manages it.
+//   - AzureFirewallSubnet and AzureBastionSubnet: CANNOT have a user-assigned NSG. Azure manages it. 
 //   - GatewaySubnet: CAN have an NSG but Microsoft recommends against it to
 //     avoid breaking VPN/ExpressRoute traffic.
 //
