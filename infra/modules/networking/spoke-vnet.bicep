@@ -16,7 +16,7 @@
 //   different IP ranges and potentially different NSG rules. Instead of writing
 //   two modules, we write one and parameterize the differences.
 //
-//   In a real InSpark engagement, you might add more spokes later (staging, test,
+//   In a real AZL engagement, you might add more spokes later (staging, test,
 //   DMZ). This module handles that without any code changes — just new parameters.
 //
 // SUBNET TIERS (3-tier architecture):

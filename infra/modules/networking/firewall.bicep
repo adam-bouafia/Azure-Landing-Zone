@@ -13,7 +13,7 @@
 //   - Native integration with Azure Monitor, Log Analytics, Azure Policy
 //   - Built-in threat intelligence feed from Microsoft's security team
 //   - Scales automatically with traffic (no manual scale-out)
-//   - InSpark standardizes on Azure-native services for managed clients
+//   - AZL standardizes on Azure-native services for managed clients
 //
 // HOW IT WORKS:
 //   The firewall gets a public IP and a private IP (in AzureFirewallSubnet).
@@ -63,7 +63,7 @@ param deployFirewall bool = false
 ])
 param skuTier string = 'Standard'
 
-@description('Tags for cost allocation and governance.') // "Tags are key-value pairs that help with cost allocation and governance. Please provide any tags you want to apply to the firewall and firewall policy resources. For example: { 'Environment': 'Prod', 'Project': 'InSparkLandingZone' }."
+@description('Tags for cost allocation and governance.') // "Tags are key-value pairs that help with cost allocation and governance. Please provide any tags you want to apply to the firewall and firewall policy resources. For example: { 'Environment': 'Prod', 'Project': 'AZLLandingZone' }."
 param tags object
 
 // -- Public IP ---------------------------------------------------------------
@@ -193,7 +193,7 @@ resource applicationRuleCollectionGroup 'Microsoft.Network/firewallPolicies/rule
         // WINDOWS UPDATE
         // VMs need to pull updates from Microsoft. These FQDNs are the
         // standard Windows Update endpoints. Without this, your VMs will
-        // never get security patches — a compliance nightmare for InSpark.
+        // never get security patches — a compliance nightmare for AZL.
         ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
         name: 'AllowWindowsUpdate'
         priority: 100

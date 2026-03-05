@@ -1,0 +1,58 @@
+# ============================================================================
+# PIPELINE TEMPLATE: What-If Analysis
+# ============================================================================
+#
+# WHAT THIS IS:
+#   Runs Azure's "what-if" deployment operation. This shows exactly what would
+#   happen if you deployed — which resources would be created, modified, deleted,
+#   or left unchanged — WITHOUT actually making any changes.
+#
+# WHY IT MATTERS:
+#   In managed services, you NEVER deploy to production blind. The what-if
+#   output goes into the pipeline logs where an engineer reviews it before
+#   approving the production deployment. This is the "measure twice, cut once"
+#   of infrastructure deployment.
+#
+# WHAT-IF OUTPUT EXAMPLE:
+#   Resource and calculation changes:
+#   + Microsoft.Network/virtualNetworks/vnet-hub-weu [Create]
+#   ~ Microsoft.Network/networkSecurityGroups/nsg-web-prod [Modify]
+#     - properties.securityRules[0].properties.sourceAddressPrefix: "10.0.1.0/26" => "*"
+#   = Microsoft.Resources/resourceGroups/rg-hub-weu [NoChange]
+#
+#   The + ~ = symbols tell you at a glance what's changing.
+#
+# ============================================================================
+
+parameters:
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+    default: 'dev'
+  - name: dependsOn
+    type: string
+    default: 'Validate'
+
+stages:
+  - stage: WhatIf${{ parameters.environment }}
+    displayName: 'What-If (${{ parameters.environment }})'
+    dependsOn: ${{ parameters.dependsOn }}
+    jobs:
+      - job: WhatIf
+        displayName: 'Preview Changes'
+        steps:
+          - task: AzureCLI@2
+            displayName: 'What-If Analysis'
+            inputs:
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: 'bash'
+              inlineScript: |
+                echo "=== What-If Preview for ${{ parameters.environment }} ==="
+                echo ""
+                az deployment sub what-if \
+                  --location westeurope \
+                  --template-file infra/main.bicep \
+                  --parameters infra/main.${{ parameters.environment }}.bicepparam \
+                  --parameters jumpboxAdminPassword='$(jumpboxAdminPassword)' \
+                  --result-format FullResourcePayloads

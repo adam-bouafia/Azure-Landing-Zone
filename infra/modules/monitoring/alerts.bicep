@@ -21,7 +21,7 @@
 //   - Webhook (to integrate with ServiceNow, PagerDuty, etc.)
 //   - Azure Function / Logic App (for automated remediation)
 //
-//   In InSpark's real setup, alerts would go to their 24/7 NOC
+//   In AZL's real setup, alerts would go to their 24/7 NOC
 //   (Network Operations Center) via integration with their ITSM tool.
 //
 // ALERTS WE CREATE:
@@ -60,7 +60,7 @@ resource actionGroup 'Microsoft.Insights/actionGroups@2023-01-01' = { // "Create
     enabled: true
     emailReceivers: [
       {
-        name: 'InSpark Operations'
+        name: 'AZL Operations'
         emailAddress: alertEmailAddress
         useCommonAlertSchema: true  // Standardized alert format across all alert types
       }

@@ -23,7 +23,7 @@
   ],
   "properties": {
     "displayName": "Require mandatory tags on resources",
-    "description": "Denies creation of resources that are missing required tags: Environment, ManagedBy, CostCenter, Project. Part of Contoso NL governance framework managed by InSpark.",
+    "description": "Denies creation of resources that are missing required tags: Environment, ManagedBy, CostCenter, Project. Part of AZL governance framework managed by AZL.",
     "mode": "Indexed",
     "policyRule": {
       "if": {

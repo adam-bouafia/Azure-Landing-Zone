@@ -104,11 +104,11 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = { // "Create the vi
       adminPassword: adminPassword
       windowsConfiguration: {
         // Enable auto-updates. In a managed services environment, you want
-        // VMs patched automatically. InSpark would typically use Azure Update
+        // VMs patched automatically. AZL would typically use Azure Update
         // Manager for controlled patching, but auto-updates are a safe default.
         enableAutomaticUpdates: true
         provisionVMAgent: true
-        // Timezone set to Amsterdam (Contoso NL is a Dutch company)
+        // Timezone set to Amsterdam 
         timeZone: 'W. Europe Standard Time'
       }
     }

@@ -8,10 +8,10 @@
 //   gets corrupted, ransomware hits, or someone accidentally deletes data,
 //   you restore from the vault.
 //
-// WHY THIS MATTERS FOR INSPARK:
+// WHY THIS MATTERS FOR AZL:
 //   Backup is a core managed services responsibility. If a client's data is
 //   lost because backups weren't configured, that's a critical failure.
-//   InSpark's SLAs typically include RPO (Recovery Point Objective) and
+//   AZL's SLAs typically include RPO (Recovery Point Objective) and
 //   RTO (Recovery Time Objective) commitments:
 //   - RPO = how much data can you afford to lose? (24h = daily backups)
 //   - RTO = how fast must you recover? (depends on VM size and data volume)

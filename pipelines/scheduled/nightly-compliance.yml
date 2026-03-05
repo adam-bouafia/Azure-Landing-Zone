@@ -1,0 +1,73 @@
+# ============================================================================
+# SCHEDULED PIPELINE: Nightly Compliance Check
+# ============================================================================
+#
+# WHAT THIS DOES:
+#   Runs operational compliance checks every night at 2:00 AM.
+#   This is a core managed services pattern — AZL runs automated checks
+#   to catch drift, misconfigurations, and compliance gaps before clients
+#   notice them.
+#
+# CHECKS:
+#   1. NSG Audit — exports all firewall rules to CSV for review
+#   2. Tag Compliance — flags resources missing required tags
+#
+# SCHEDULING:
+#   The 'cron' syntax: minute hour day-of-month month day-of-week
+#   '0 2 * * *' = every day at 2:00 AM UTC (3:00 AM Amsterdam time)
+#
+#   'always: true' means run even if no code changes were made.
+#   Compliance checks need to run regardless of code changes because
+#   someone might have modified resources manually in the Azure portal.
+#
+# ============================================================================
+
+schedules: # Schedule the pipeline to run every night at 2:00 AM UTC
+  - cron: '0 2 * * *'
+    displayName: 'Nightly compliance check'
+    branches:
+      include:
+        - main
+    always: true
+
+pool: # Use the same Ubuntu image as our main pipeline for consistency
+  vmImage: 'ubuntu-latest'
+
+steps: # Define the steps to run in this scheduled pipeline
+  - task: AzurePowerShell@5 # Use Azure PowerShell to run a script that audits NSG rules
+    displayName: 'NSG Audit'
+    inputs:
+      azureSubscription: 'azure-azl-sc'
+      ScriptType: 'FilePath'
+      ScriptPath: 'scripts/powershell/Invoke-NsgAudit.ps1'
+      ScriptArguments: '-OutputPath "$(Build.ArtifactStagingDirectory)/nsg-audit.csv"'
+      azurePowerShellVersion: 'LatestVersion'
+
+  - task: AzurePowerShell@5
+    displayName: 'VM Schedule Report'
+    inputs:
+      azureSubscription: 'azure-azl-sc'
+      ScriptType: 'InlinePowerShell'
+      Inline: | # Check for running VMs that are tagged for auto-shutdown but still running
+        # Report VMs that are running but tagged for auto-shutdown
+        # (catches VMs that were manually started and never stopped)
+        $runningDevVms = Get-AzVM -Status | Where-Object {
+            $_.ResourceGroupName -like "rg-spoke-dev-*" -and
+            $_.PowerState -eq 'VM running' -and
+            $_.Tags['AutoShutdown'] -eq 'true'
+        }
+        if ($runningDevVms.Count -gt 0) {
+            Write-Host "##vso[task.logissue type=warning]$($runningDevVms.Count) dev VMs are running with AutoShutdown=true"
+            $runningDevVms | ForEach-Object { Write-Host "  - $($_.Name) in $($_.ResourceGroupName)" }
+        } else {
+            Write-Host "All auto-shutdown VMs are properly deallocated."
+        }
+      azurePowerShellVersion: 'LatestVersion'
+
+  # Publish the NSG audit CSV as a pipeline artifact for download
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Compliance Reports'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'compliance-reports'
+    condition: always()

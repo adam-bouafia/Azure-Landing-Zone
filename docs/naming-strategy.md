@@ -34,10 +34,10 @@ subscriptions, without naming standards, it becomes chaos.
 | Virtual Machine        | `vm`    | `vm-{role}-{env}-{number}`             | `vm-jumpbox-hub-001`     |
 | Network Interface      | `nic`   | `nic-{vm-name}`                        | `nic-vm-jumpbox-hub-001` |
 | OS Disk                | `osdisk`| `osdisk-{vm-name}`                     | `osdisk-vm-jumpbox-hub-001` |
-| Key Vault              | `kv`    | `kv-{workload}-{env}-{unique}`         | `kv-contoso-prod-001`    |
-| Log Analytics          | `log`   | `log-{workload}-{env}`                 | `log-contoso-prod`       |
-| Recovery Services Vault| `rsv`   | `rsv-{workload}-{env}`                 | `rsv-contoso-prod`       |
-| Storage Account        | `st`    | `st{workload}{env}{unique}` (no dashes)| `stcontosoprod001`       |
+| Key Vault              | `kv`    | `kv-{workload}-{env}-{unique}`         | `kv-azl-prod-001`    |
+| Log Analytics          | `log`   | `log-{workload}-{env}`                 | `log-azl-prod`       |
+| Recovery Services Vault| `rsv`   | `rsv-{workload}-{env}`                 | `rsv-azl-prod`       |
+| Storage Account        | `st`    | `st{workload}{env}{unique}` (no dashes)| `stazlprod001`       |
 | VNet Peering           | `peer`  | `peer-{source}-to-{destination}`       | `peer-hub-to-spoke-prod` |
 
 ## Azure Naming Constraints to Know

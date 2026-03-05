@@ -6,7 +6,7 @@
     "",
     "WHY THIS MATTERS:",
     "Data sovereignty. Dutch organizations (especially government-adjacent like",
-    "Contoso NL) often have requirements about where data is stored. The GDPR",
+    "often have requirements about where data is stored. The GDPR",
     "requires that personal data stays within the EU. This policy ensures that",
     "nobody accidentally deploys resources to US East or Southeast Asia.",
     "",

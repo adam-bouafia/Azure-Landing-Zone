@@ -1,0 +1,87 @@
+# ============================================================================
+# MAIN CI/CD PIPELINE: Azure Landing Zone Deployment
+# ============================================================================
+#
+# WHAT THIS DOES:
+#   This is the main deployment pipeline. It runs automatically when changes
+#   are pushed to the main branch (affecting infra/ files), or when a PR
+#   targets main. The pipeline has 5 stages:
+#
+#   1. Validate  — Lint and compile all Bicep files (catches syntax errors)
+#   2. WhatIf Dev — Preview what WOULD change in dev (no actual deployment)
+#   3. Deploy Dev — Actually deploy to dev (auto-approved)
+#   4. WhatIf Prod — Preview what WOULD change in prod
+#   5. Deploy Prod — Deploy to prod (requires manual approval gate)
+#
+# WHY WHAT-IF:
+#   Azure's what-if operation shows you exactly what resources will be created,
+#   modified, or deleted — BEFORE it happens. This is critical in managed
+#   services: you never deploy to prod without reviewing what changes.
+#   The what-if output goes into the pipeline logs for review.
+#
+# APPROVAL GATES:
+#   The prod deployment requires a manual approval in Azure DevOps.
+#   This is configured on the 'prod' environment in Azure DevOps settings,
+#   not in this YAML file. The pipeline pauses and waits for an approver.
+#
+# SERVICE CONNECTION:
+#   'azure-azl-sc' is an Azure DevOps service connection that authenticates
+#   to our Azure subscription using the service principal we created.
+#   It's configured once in Azure DevOps Project Settings → Service Connections.
+#
+# ============================================================================
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - infra/*
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: serviceConnection
+    value: 'azure-azl-sc'
+  - name: location
+    value: 'westeurope'
+
+stages:
+  # Stage 1: Validate all Bicep files
+  - template: templates/bicep-validate.yml
+    parameters:
+      serviceConnection: $(serviceConnection)
+
+  # Stage 2: What-if for dev
+  - template: templates/bicep-whatif.yml
+    parameters:
+      serviceConnection: $(serviceConnection)
+      environment: 'dev'
+
+  # Stage 3: Deploy to dev (depends on what-if completing)
+  - template: templates/bicep-deploy.yml
+    parameters:
+      serviceConnection: $(serviceConnection)
+      environment: 'dev'
+      dependsOn: 'WhatIfdev'
+
+  # Stage 4: What-if for prod (only after dev succeeds)
+  - template: templates/bicep-whatif.yml
+    parameters:
+      serviceConnection: $(serviceConnection)
+      environment: 'prod'
+      dependsOn: 'Deploydev'
+
+  # Stage 5: Deploy to prod (requires manual approval on 'prod' environment)
+  - template: templates/bicep-deploy.yml
+    parameters:
+      serviceConnection: $(serviceConnection)
+      environment: 'prod'
+      dependsOn: 'WhatIfprod'

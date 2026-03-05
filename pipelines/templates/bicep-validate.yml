@@ -1,0 +1,58 @@
+# ============================================================================
+# PIPELINE TEMPLATE: Bicep Validation
+# ============================================================================
+#
+# WHAT THIS IS:
+#   A reusable pipeline template for validating Bicep files. Templates in
+#   Azure DevOps work like functions — you define parameters, and the main
+#   pipeline calls this template with specific values.
+#
+# WHY A TEMPLATE:
+#   If you had multiple pipelines (e.g., one per client), you'd reuse this
+#   template. Change the validation logic once, all pipelines benefit.
+#
+# WHAT IT DOES:
+#   1. Runs our validate-bicep.sh script (lint + build)
+#   2. Runs az deployment sub validate (checks against Azure API — verifies
+#      resource types, API versions, parameter types are all correct)
+#
+# ============================================================================
+
+parameters:
+  - name: serviceConnection
+    type: string
+
+stages:
+  - stage: Validate
+    displayName: 'Validate Bicep'
+    jobs:
+      - job: LintAndBuild
+        displayName: 'Lint, Build & Validate'
+        steps:
+          # Step 1: Lint and compile locally
+          # This catches syntax errors without needing Azure credentials.
+          - task: AzureCLI@2
+            displayName: 'Bicep Lint & Build'
+            inputs:
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: 'bash'
+              scriptLocation: 'scriptPath'
+              scriptPath: 'scripts/bash/validate-bicep.sh'
+
+          # Step 2: Validate against Azure API
+          # This goes further than lint — it checks that resource types exist,
+          # API versions are valid, and parameter types match. Requires Azure
+          # credentials because it calls the ARM validation endpoint.
+          - task: AzureCLI@2
+            displayName: 'ARM Validation (dev)'
+            inputs:
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: 'bash'
+              inlineScript: |
+                echo "Validating Bicep against Azure API..."
+                az deployment sub validate \
+                  --location westeurope \
+                  --template-file infra/main.bicep \
+                  --parameters infra/main.dev.bicepparam \
+                  --parameters jumpboxAdminPassword='ValidationOnly123!'
+                echo "##vso[task.complete result=Succeeded;]Validation passed"

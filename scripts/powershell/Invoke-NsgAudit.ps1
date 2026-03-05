@@ -3,7 +3,7 @@
     Audits all NSG rules across resource groups and exports a CSV compliance report.
 
 .DESCRIPTION
-    This script is a core operational tool for InSpark's managed services team.
+    This script is a core operational tool for AZL's managed services team.
     It retrieves every Network Security Group in the target resource groups, lists
     all security rules (both custom and default), and exports a flat CSV report.
 

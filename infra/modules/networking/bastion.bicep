@@ -8,8 +8,8 @@
 //   You open the Azure portal → navigate to the VM → click "Connect" →
 //   "Bastion" → enter credentials → you get an in-browser RDP/SSH session.
 //
-// WHY THIS MATTERS FOR INSPARK:
-//   InSpark manages client VMs 24/7. Their engineers need to RDP into VMs
+// WHY THIS MATTERS FOR AZL:
+//   AZL manages client VMs 24/7. Their engineers need to RDP into VMs
 //   for troubleshooting, patching, and configuration. Without Bastion, you'd
 //   need to either:
 //   a) Put a public IP on every VM (security nightmare — exposed to the internet)
@@ -53,7 +53,7 @@ param bastionSubnetId string
 @description('Deploy Bastion? Set false to save ~€140/month during dev/test.') // "Do you want to deploy the Bastion host? Set this to false to save approximately €140/month during development and testing. You can deploy the Bastion host later when you need it."
 param deployBastion bool = false
 
-@description('Tags for cost allocation and governance.') // "What tags should be applied to the Bastion host and its associated resources for cost allocation and governance? Provide a key-value object, e.g., { 'Environment': 'Production', 'Project': 'InSpark' }."
+@description('Tags for cost allocation and governance.') // "What tags should be applied to the Bastion host and its associated resources for cost allocation and governance? Provide a key-value object, e.g., { 'Environment': 'Production', 'Project': 'AZL' }."
 param tags object
 
 // -- Public IP ---------------------------------------------------------------

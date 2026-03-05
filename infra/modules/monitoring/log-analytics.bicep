@@ -5,7 +5,7 @@
 // WHAT THIS IS:
 //   Log Analytics is the central log sink for the entire landing zone. Every
 //   Azure resource sends its diagnostic logs and metrics here. It's where
-//   InSpark's engineers go to investigate incidents, analyze performance,
+//   AZL's engineers go to investigate incidents, analyze performance,
 //   and run security audits.
 //
 // HOW IT WORKS:

@@ -3,7 +3,7 @@
     Start or stop VMs based on tags. Used for dev/test cost optimization.
 
 .DESCRIPTION
-    This script is an InSpark cost optimization pattern. Dev/test VMs don't need
+    This script is an AZL cost optimization pattern. Dev/test VMs don't need
     to run 24/7. By tagging VMs with AutoShutdown=true and scheduling this script
     to run at 7 PM (stop) and 8 AM (start), clients save ~70% on compute costs
     for non-production workloads.
