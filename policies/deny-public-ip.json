@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2020-10-01/policyDefinition.json",
+  "_comment": [
+    "WHAT THIS IS:",
+    "An Azure Policy that denies the creation of public IP addresses in spoke",
+    "resource groups. Hub resources (Firewall, Bastion) need public IPs, but",
+    "spoke workloads should NEVER have them.",
+    "",
+    "WHY THIS MATTERS:",
+    "A public IP on a spoke VM means that VM is directly reachable from the",
+    "internet. This bypasses the Azure Firewall entirely — all our network",
+    "security rules become useless. It's the #1 security anti-pattern in",
+    "hub-spoke architectures.",
+    "",
+    "SCOPE:",
+    "This policy should be assigned to spoke resource groups only, NOT the hub.",
+    "The hub needs public IPs for Firewall and Bastion.",
+    "",
+    "ASSIGNMENT EXAMPLE:",
+    "az policy assignment create --name 'deny-public-ip-prod' \\",
+    "  --policy 'deny-public-ip' \\",
+    "  --scope '/subscriptions/{sub-id}/resourceGroups/rg-spoke-prod-weu'"
+  ],
+  "properties": {
+    "displayName": "Deny public IP addresses on spoke VNets",
+    "description": "Prevents creation of public IP addresses in spoke resource groups. All internet access must go through the hub Azure Firewall. Assign this policy to spoke resource groups only.",
+    "mode": "Indexed",
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "equals": "Microsoft.Network/publicIPAddresses"
+      },
+      "then": {
+        "effect": "deny"
+      }
+    },
+    "metadata": {
+      "category": "Network",
+      "version": "1.0.0"
+    }
+  }
+}

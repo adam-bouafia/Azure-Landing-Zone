@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2020-10-01/policyDefinition.json",
+  "_comment": [
+    "WHAT THIS IS:",
+    "An Azure Policy definition that DENIES resource creation when required tags are missing.",
+    "",
+    "HOW AZURE POLICY WORKS:",
+    "Azure Policy evaluates resource operations (create, update) against rules.",
+    "If a resource violates a policy with 'Deny' effect, the operation is blocked.",
+    "The user sees an error: 'Resource creation denied by policy: require-tags'.",
+    "",
+    "WHY THIS MATTERS:",
+    "In managed services, untagged resources are invisible to cost reports and",
+    "compliance audits. If someone creates a VM without a CostCenter tag, you",
+    "can't allocate its cost to the right team. This policy prevents that.",
+    "",
+    "NOTE: This is a CUSTOM policy definition. Azure also has built-in policies",
+    "for tag enforcement, but custom ones let you enforce multiple tags in one policy.",
+    "",
+    "DEPLOYMENT:",
+    "az policy definition create --name 'require-tags' --rules policies/require-tags.json",
+    "az policy assignment create --name 'require-tags' --policy 'require-tags' --scope '/subscriptions/{sub-id}'"
+  ],
+  "properties": {
+    "displayName": "Require mandatory tags on resources",
+    "description": "Denies creation of resources that are missing required tags: Environment, ManagedBy, CostCenter, Project. Part of Contoso NL governance framework managed by InSpark.",
+    "mode": "Indexed",
+    "policyRule": {
+      "if": {
+        "anyOf": [
+          {
+            "field": "tags['Environment']",
+            "exists": "false"
+          },
+          {
+            "field": "tags['ManagedBy']",
+            "exists": "false"
+          },
+          {
+            "field": "tags['CostCenter']",
+            "exists": "false"
+          },
+          {
+            "field": "tags['Project']",
+            "exists": "false"
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    },
+    "metadata": {
+      "category": "Tags",
+      "version": "1.0.0"
+    }
+  }
+}

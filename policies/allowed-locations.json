@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2020-10-01/policyDefinition.json",
+  "_comment": [
+    "WHAT THIS IS:",
+    "An Azure Policy that restricts resource deployment to approved Azure regions.",
+    "",
+    "WHY THIS MATTERS:",
+    "Data sovereignty. Dutch organizations (especially government-adjacent like",
+    "Contoso NL) often have requirements about where data is stored. The GDPR",
+    "requires that personal data stays within the EU. This policy ensures that",
+    "nobody accidentally deploys resources to US East or Southeast Asia.",
+    "",
+    "ALLOWED REGIONS:",
+    "- westeurope (Amsterdam) — primary region",
+    "- northeurope (Dublin) — DR/secondary region",
+    "Both are within the EU, satisfying GDPR requirements.",
+    "",
+    "NOTE: 'global' is also allowed because some resources (action groups, policy",
+    "definitions, role assignments) are global and have no region."
+  ],
+  "properties": {
+    "displayName": "Restrict resource locations to West Europe and North Europe",
+    "description": "Only allows resource creation in West Europe (Amsterdam) and North Europe (Dublin). Ensures data sovereignty compliance for Dutch clients.",
+    "mode": "Indexed",
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "location",
+            "notIn": [
+              "westeurope",
+              "northeurope",
+              "global"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    },
+    "metadata": {
+      "category": "General",
+      "version": "1.0.0"
+    }
+  }
+}
