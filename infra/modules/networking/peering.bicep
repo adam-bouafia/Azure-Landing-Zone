@@ -41,10 +41,11 @@
 //     the "enable peering" flag. Almost always true.
 //
 // IMPORTANT GOTCHA:
-//   This module deploys into the HUB's resource group because both peering
-//   resources (hub→spoke and spoke→hub) are child resources of their
-//   respective VNets. Since the spoke VNet lives in a different resource group,
-//   we use the `existing` keyword to reference it across resource groups.
+//   This module deploys into the HUB's resource group. It only creates the
+//   hub→spoke direction. The reverse direction (spoke→hub) is handled by a
+//   separate module (peering-spoke-to-hub.bicep) that deploys into the
+//   SPOKE's resource group. This is necessary because Bicep error BCP165
+//   prevents creating child resources on VNets in a different scope.
 //
 //   In main.bicep, this module is scoped to the hub resource group.
 //
@@ -64,7 +65,7 @@ param hubVnetId string
 @description('Full resource ID of the spoke VNet.')
 param spokeVnetId string
 
-@description('Resource group name where the spoke VNet lives.')
+@description('Resource group name where the spoke VNet lives (used for documentation only).')
 param spokeResourceGroupName string
 
 @description('Allow forwarded traffic (from NVA/Firewall). Default: true.')
@@ -81,12 +82,6 @@ param useRemoteGateways bool = false
 // Reference the hub VNet (already exists in the current resource group)
 resource hubVnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
   name: hubVnetName
-}
-
-// Reference the spoke VNet (exists in a different resource group)
-resource spokeVnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
-  name: spokeVnetName
-  scope: resourceGroup(spokeResourceGroupName)
 }
 
 // PEERING 1: Hub → Spoke
@@ -108,34 +103,14 @@ resource hubToSpokePeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeer
   }
 }
 
-// PEERING 2: Spoke → Hub
-// This is a child resource of the spoke VNet. We need to use a module-level
-// scope trick since the spoke VNet is in a different resource group.
-// However, since we're deploying this module into the hub's resource group,
-// we reference the spoke VNet as an existing resource in its own RG.
-resource spokeToHubPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
-  name: 'peer-${spokeVnetName}-to-${hubVnetName}'
-  parent: spokeVnet
-  properties: {
-    remoteVirtualNetwork: {
-      id: hubVnetId
-    }
-    allowVirtualNetworkAccess: true
-    allowForwardedTraffic: allowForwardedTraffic
-    // Spoke side: never offer gateway transit — only the hub has the gateway
-    allowGatewayTransit: false
-    // Spoke side: use hub's gateway if available
-    useRemoteGateways: useRemoteGateways
-  }
-}
+// NOTE: The reverse peering (Spoke → Hub) is deployed by a separate module
+// (peering-spoke-to-hub.bicep) scoped to the spoke's resource group.
+// This is required because Bicep can't deploy child resources across scopes.
 
 // -- Outputs -----------------------------------------------------------------
 
 @description('Resource ID of the hub-to-spoke peering.')
 output hubToSpokePeeringId string = hubToSpokePeering.id
 
-@description('Resource ID of the spoke-to-hub peering.')
-output spokeToHubPeeringId string = spokeToHubPeering.id
-
-@description('Peering state. Should be "Connected" after successful deployment.')
+@description('Peering state. Should be "Connected" after both directions are deployed.')
 output peeringState string = hubToSpokePeering.properties.peeringState

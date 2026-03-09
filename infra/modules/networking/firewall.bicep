@@ -241,10 +241,10 @@ resource applicationRuleCollectionGroup 'Microsoft.Network/firewallPolicies/rule
               { protocolType: 'Https', port: 443 }
             ]
             targetFqdns: [
-              'management.azure.com'
-              'login.microsoftonline.com'
-              '*.blob.core.windows.net'
-              '*.table.core.windows.net'
+              environment().resourceManager                         // management.azure.com
+              environment().authentication.loginEndpoint             // login.microsoftonline.com
+              '*.blob.${environment().suffixes.storage}'             // *.blob.core.windows.net
+              '*.table.${environment().suffixes.storage}'            // *.table.core.windows.net
               '*.opinsights.azure.com'        // Log Analytics
               '*.ods.opinsights.azure.com'    // Log Analytics data
               '*.monitoring.azure.com'         // Azure Monitor
@@ -289,10 +289,10 @@ resource firewall 'Microsoft.Network/azureFirewalls@2024-05-01' = if (deployFire
 // -- Outputs -----------------------------------------------------------------
 
 @description('Firewall private IP. Used in route tables to direct spoke traffic through the firewall.') // "What is the private IP address of the firewall? This is used in route tables to direct spoke traffic through the firewall. If the firewall is not deployed, this will be an empty string."
-output firewallPrivateIp string = deployFirewall ? firewall.properties.ipConfigurations[0].properties.privateIPAddress : ''
+output firewallPrivateIp string = deployFirewall ? firewall!.properties.ipConfigurations[0].properties.privateIPAddress : ''
 
 @description('Firewall public IP address. Used for DNAT rules and documentation.') // "What is the public IP address of the firewall? This is used for DNAT rules and documentation. If the firewall is not deployed, this will be an empty string."
-output firewallPublicIpAddress string = deployFirewall ? firewallPublicIp.properties.ipAddress : ''
+output firewallPublicIpAddress string = deployFirewall ? firewallPublicIp!.properties.ipAddress : ''
 
 @description('Firewall resource ID.') // "What is the resource ID of the firewall? This can be used for referencing the firewall in other modules or for documentation. If the firewall is not deployed, this will be an empty string."
 output firewallId string = deployFirewall ? firewall.id : ''

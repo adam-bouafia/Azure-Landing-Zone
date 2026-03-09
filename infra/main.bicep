@@ -535,6 +535,36 @@ module peeringDev 'modules/networking/peering.bicep' = { // "Create virtual netw
   }
 }
 
+// --- Reverse Peering: Spoke → Hub ---
+// These are deployed into the SPOKE resource groups because Bicep requires
+// child resources to be in the same scope as their parent VNet (BCP165).
+
+module peeringProdReverse 'modules/networking/peering-spoke-to-hub.bicep' = {
+  scope: rgSpokeProd
+  name: 'deploy-peering-prod-reverse'
+  dependsOn: [peeringProd]
+  params: {
+    spokeVnetName: spokeProd.outputs.spokeVnetName
+    hubVnetName: hubNetwork.outputs.hubVnetName
+    hubVnetId: hubNetwork.outputs.hubVnetId
+    allowForwardedTraffic: true
+    useRemoteGateways: false
+  }
+}
+
+module peeringDevReverse 'modules/networking/peering-spoke-to-hub.bicep' = {
+  scope: rgSpokeDev
+  name: 'deploy-peering-dev-reverse'
+  dependsOn: [peeringDev]
+  params: {
+    spokeVnetName: spokeDev.outputs.spokeVnetName
+    hubVnetName: hubNetwork.outputs.hubVnetName
+    hubVnetId: hubNetwork.outputs.hubVnetId
+    allowForwardedTraffic: true
+    useRemoteGateways: false
+  }
+}
+
 // ============================================================================
 // STEP 6: AZURE FIREWALL + BASTION
 // ============================================================================
@@ -620,7 +650,6 @@ module alerts 'modules/monitoring/alerts.bicep' = { // "Create monitoring alerts
   scope: rgShared
   name: 'deploy-alerts'
   params: {
-    location: location
     alertEmailAddress: alertEmailAddress
     vmResourceId: jumpbox.outputs.vmId
     tags: tags

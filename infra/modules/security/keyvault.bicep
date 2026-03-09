@@ -56,6 +56,7 @@ param tags object
 param logAnalyticsWorkspaceId string = ''
 
 @description('Object ID of the principal (user or service principal) that should have Secrets Officer role. This allows the deployer to write secrets.')
+@secure()
 param secretsOfficerObjectId string = ''
 
 // -- Key Vault ---------------------------------------------------------------

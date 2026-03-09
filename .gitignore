@@ -23,3 +23,7 @@ Thumbs.db
 # Secrets — NEVER commit these
 *.env
 credentials.json
+
+# Claude Code
+.claude/
+
