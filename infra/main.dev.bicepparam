@@ -9,15 +9,19 @@
 //   deploy dev, it uses the same parameters.
 //
 // HOW TO USE:
+//   export JUMPBOX_ADMIN_PASSWORD='YourP@ssw0rd!'
 //   az deployment sub create \
 //     --location westeurope \
-//     --template-file infra/main.bicep \
-//     --parameters infra/main.dev.bicepparam \
-//     --parameters jumpboxAdminPassword='YourP@ssw0rd!'
+//     --parameters infra/main.dev.bicepparam
 //
 // NOTE ON SECURE PARAMETERS:
-//   jumpboxAdminPassword is @secure() — it CANNOT be stored in this file.
-//   Always pass it at deployment time via command line or Key Vault reference.
+//   jumpboxAdminPassword is @secure() — it CANNOT be hardcoded in this file.
+//   It reads from the JUMPBOX_ADMIN_PASSWORD environment variable at deploy time.
+//   Set it before deploying:
+//     export JUMPBOX_ADMIN_PASSWORD='YourP@ssw0rd!'
+//     az deployment sub create \
+//       --location westeurope \
+//       --parameters infra/main.dev.bicepparam
 //
 // ============================================================================
 
@@ -28,7 +32,7 @@ param location = 'westeurope'
 param tags = {
   Environment: 'Development'
   ManagedBy: 'alzadmin'
-  Project: 'ALZ'
+  Project: 'alz'
   CostCenter: 'IT-Infra-001'
 }
 
@@ -36,6 +40,9 @@ param tags = {
 param deployFirewall = false     // ~€912/month — only deploy to test, then tear down
 param deployBastion = false      // ~€140/month — deploy when you need VM access
 param jumpboxAdminUsername = 'azureadmin'
+// Password is read from env var — set it before deploying:
+//   export JUMPBOX_ADMIN_PASSWORD='YourP@ssw0rd!'
+param jumpboxAdminPassword = readEnvironmentVariable('JUMPBOX_ADMIN_PASSWORD')
 
 // Phase 3
 param alertEmailAddress = 'ops@alz.nl'

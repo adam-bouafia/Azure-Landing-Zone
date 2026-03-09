@@ -59,23 +59,14 @@ param hubVnetName string
 @description('Name of the spoke VNet. Must already exist in its resource group.')
 param spokeVnetName string
 
-@description('Full resource ID of the hub VNet.')
-param hubVnetId string
-
 @description('Full resource ID of the spoke VNet.')
 param spokeVnetId string
-
-@description('Resource group name where the spoke VNet lives (used for documentation only).')
-param spokeResourceGroupName string
 
 @description('Allow forwarded traffic (from NVA/Firewall). Default: true.')
 param allowForwardedTraffic bool = true
 
 @description('Allow hub to share its gateway with spokes. Default: true.')
 param allowGatewayTransit bool = true
-
-@description('Spoke uses hub gateway for on-prem connectivity. Default: false (no gateway deployed yet).')
-param useRemoteGateways bool = false
 
 // -- Resources ---------------------------------------------------------------
 

@@ -22,7 +22,7 @@ resource creation if any are missing.
 | `Environment`  | Deployment environment       | `Production`, `Development`, `Test`    | `Production`         |
 | `ManagedBy`    | Responsible operations team  | `Adam`                              | `Adam`            |
 | `CostCenter`   | Financial cost allocation    | Format: `{dept}-{code}`                | `IT-Infra-001`       |
-| `Project`      | Project or client identifier | Free text                              | `ALZ`         |
+| `Project`      | Project or client identifier | Free text                              | `alz`         |
 | `Owner`        | Primary contact for resource | Email address                          | `adam@alz.nl`|
 
 ## Optional Tags
@@ -46,7 +46,7 @@ param tags object = {
   Environment: 'Production'
   ManagedBy: 'Adam'
   CostCenter: 'IT-Infra-001'
-  Project: 'ALZ'
+  Project: 'alz'
   Owner: 'adam@alz.nl'
 }
 

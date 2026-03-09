@@ -49,8 +49,8 @@ param adminUsername string
 @secure()
 param adminPassword string
 
-@description('VM size. B2s is cost-effective for a management jumpbox.')
-param vmSize string = 'Standard_B2s'
+@description('VM size. B2s_v2 is cost-effective for a management jumpbox.')
+param vmSize string = 'Standard_B2s_v2'
 
 @description('Resource ID of the Log Analytics workspace for monitoring agent.')
 param logAnalyticsWorkspaceId string = ''

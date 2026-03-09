@@ -1,4 +1,4 @@
-# ALZ
+# alz
 
 A production Azure Landing Zone for a fictional managed services client, built entirely in Bicep and deployed through Azure DevOps. This project simulates the infrastructure that an Azure Expert MSP delivers for enterprise client.
 

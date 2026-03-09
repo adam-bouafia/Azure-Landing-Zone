@@ -241,8 +241,13 @@ resource applicationRuleCollectionGroup 'Microsoft.Network/firewallPolicies/rule
               { protocolType: 'Https', port: 443 }
             ]
             targetFqdns: [
-              environment().resourceManager                         // management.azure.com
-              environment().authentication.loginEndpoint             // login.microsoftonline.com
+              // Note: environment().resourceManager returns 'https://management.azure.com/'
+              // but firewall FQDN rules need just the hostname. We suppress the linter warning
+              // because the environment() values include protocol/path that break FQDN rules.
+              #disable-next-line no-hardcoded-env-urls
+              'management.azure.com'
+              #disable-next-line no-hardcoded-env-urls
+              'login.microsoftonline.com'
               '*.blob.${environment().suffixes.storage}'             // *.blob.core.windows.net
               '*.table.${environment().suffixes.storage}'            // *.table.core.windows.net
               '*.opinsights.azure.com'        // Log Analytics

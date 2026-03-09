@@ -3,11 +3,10 @@
 // ============================================================================
 //
 // HOW TO USE:
+//   export JUMPBOX_ADMIN_PASSWORD='YourP@ssw0rd!'
 //   az deployment sub create \
 //     --location westeurope \
-//     --template-file infra/main.bicep \
-//     --parameters infra/main.prod.bicepparam \
-//     --parameters jumpboxAdminPassword='YourP@ssw0rd!'
+//     --parameters infra/main.prod.bicepparam
 //
 // PRODUCTION DIFFERENCES FROM DEV:
 //   - Firewall and Bastion are always-on (critical for client operations)
@@ -24,7 +23,7 @@ param location = 'westeurope'
 param tags = {
   Environment: 'Production'
   ManagedBy: 'alzadmin'
-  Project: 'ALZ'
+  Project: 'alz'
   CostCenter: 'IT-Infra-001'
 }
 
@@ -32,6 +31,9 @@ param tags = {
 param deployFirewall = true      // Always-on in prod. Central traffic inspection.
 param deployBastion = true       // Always-on in prod. Secure VM access.
 param jumpboxAdminUsername = 'azureadmin'
+// Password is read from env var — set it before deploying:
+//   export JUMPBOX_ADMIN_PASSWORD='YourP@ssw0rd!'
+param jumpboxAdminPassword = readEnvironmentVariable('JUMPBOX_ADMIN_PASSWORD')
 
 // Phase 3
 param alertEmailAddress = 'ops@alz.nl'

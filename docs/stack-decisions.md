@@ -1,6 +1,6 @@
 # Architecture Decisions Records
 
-This document showcase the key architectural decision made during the design and implementation of ALZ. Each record explains the context, the decision, and the rationale behind every choice.
+This document showcase the key architectural decision made during the design and implementation of alz. Each record explains the context, the decision, and the rationale behind every choice.
 
 
 

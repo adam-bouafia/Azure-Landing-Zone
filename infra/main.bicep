@@ -47,11 +47,11 @@ param environment string
 @description('Azure region for all resources. West Europe = Amsterdam datacenter.') // "Where should I deploy the resources? Default is 'westeurope' (Amsterdam datacenter). You can change this to another region if needed, but make sure to choose a region that supports all the services used in this landing zone."
 param location string = 'westeurope'
 
-@description('Tags applied to every resource. Defined in parameter files.') //  "What tags should I apply to all resources for cost allocation and governance? Provide a key-value object, for example { 'Environment': 'Production', 'Project': 'ALZ' }."
+@description('Tags applied to every resource. Defined in parameter files.') //  "What tags should I apply to all resources for cost allocation and governance? Provide a key-value object, for example { 'Environment': 'Production', 'Project': 'alz' }."
 param tags object = {
   Environment: environment == 'prod' ? 'Production' : 'Development'
   ManagedBy: 'alzadmin'
-  Project: 'ALZ'
+  Project: 'alz'
   CostCenter: 'IT-Infra-001'
 }
 
@@ -122,24 +122,24 @@ resource rgShared 'Microsoft.Resources/resourceGroups@2024-03-01' = { //  "Creat
 // These deploy first because almost everything else sends logs here.
 // Log Analytics is the central nervous system of the landing zone.
 
-module logAnalytics 'modules/monitoring/log-analytics.bicep' = { // "Create a Log Analytics workspace named 'log-ALZ-{environment}' in the shared resource group with the specified location, retention period, and tags. The workspace will be used to collect and analyze logs from various resources in the landing zone. The retention period is set to 90 days for production environments and 30 days for development environments to balance cost and data availability."
+module logAnalytics 'modules/monitoring/log-analytics.bicep' = { // "Create a Log Analytics workspace named 'log-alz-{environment}' in the shared resource group with the specified location, retention period, and tags. The workspace will be used to collect and analyze logs from various resources in the landing zone. The retention period is set to 90 days for production environments and 30 days for development environments to balance cost and data availability."
   scope: rgShared
   name: 'deploy-log-analytics'
   params: {
-    workspaceName: 'log-ALZ-${environment}'
+    workspaceName: 'log-alz-${environment}'
     location: location
     retentionInDays: environment == 'prod' ? 90 : 30  // Save cost in dev
     tags: tags
   }
 }
 
-module diagnosticsStorage 'modules/storage/diagnostics-storage.bicep' = { // "Create a Storage Account named 'stdiagALZ{environment}001' in the shared resource group with the specified location, tags, and diagnostic settings. This storage account will be used to store diagnostic logs and metrics from various resources in the landing zone. The name must be globally unique and follow Azure's naming rules for storage accounts. The diagnostic settings will be configured to send data to the Log Analytics workspace created earlier."
+module diagnosticsStorage 'modules/storage/diagnostics-storage.bicep' = { // "Create a Storage Account named 'stdiagalz{environment}001' in the shared resource group with the specified location, tags, and diagnostic settings. This storage account will be used to store diagnostic logs and metrics from various resources in the landing zone. The name must be globally unique and follow Azure's naming rules for storage accounts. The diagnostic settings will be configured to send data to the Log Analytics workspace created earlier."
   scope: rgShared
   name: 'deploy-diagnostics-storage'
   params: {
     // Storage account names: no dashes, lowercase only, globally unique.
     // We append environment to avoid collisions between dev and prod.
-    storageAccountName: 'stdiagALZ${environment}001'
+    storageAccountName: 'stdiagalz${environment}001'
     location: location
     tags: tags
   }
@@ -511,12 +511,9 @@ module peeringProd 'modules/networking/peering.bicep' = { //  "Create virtual ne
   params: {
     hubVnetName: hubNetwork.outputs.hubVnetName
     spokeVnetName: spokeProd.outputs.spokeVnetName
-    hubVnetId: hubNetwork.outputs.hubVnetId
     spokeVnetId: spokeProd.outputs.spokeVnetId
-    spokeResourceGroupName: rgSpokeProd.name
     allowForwardedTraffic: true
     allowGatewayTransit: true
-    useRemoteGateways: false
   }
 }
 
@@ -526,12 +523,9 @@ module peeringDev 'modules/networking/peering.bicep' = { // "Create virtual netw
   params: {
     hubVnetName: hubNetwork.outputs.hubVnetName
     spokeVnetName: spokeDev.outputs.spokeVnetName
-    hubVnetId: hubNetwork.outputs.hubVnetId
     spokeVnetId: spokeDev.outputs.spokeVnetId
-    spokeResourceGroupName: rgSpokeDev.name
     allowForwardedTraffic: true
     allowGatewayTransit: true
-    useRemoteGateways: false
   }
 }
 
@@ -605,11 +599,11 @@ module bastion 'modules/networking/bastion.bicep' = { // "Create an Azure Bastio
 // Key Vault stores secrets (like the jumpbox admin password).
 // Deployed into the shared resource group because it serves all environments.
 
-module keyVault 'modules/security/keyvault.bicep' = { // "Create an Azure Key Vault named 'kv-ALZ-{environment}-001' in the shared resource group with the specified location, tags, and access policies. The Key Vault will be used to securely store secrets such as the jumpbox admin password. If a 'deployerObjectId' is provided, it will be granted the Secrets Officer role to allow management of secrets. The Key Vault will also be configured to send diagnostic logs to the Log Analytics workspace created earlier for monitoring and auditing purposes."
+module keyVault 'modules/security/keyvault.bicep' = { // "Create an Azure Key Vault named 'kv-alz-{environment}-001' in the shared resource group with the specified location, tags, and access policies. The Key Vault will be used to securely store secrets such as the jumpbox admin password. If a 'deployerObjectId' is provided, it will be granted the Secrets Officer role to allow management of secrets. The Key Vault will also be configured to send diagnostic logs to the Log Analytics workspace created earlier for monitoring and auditing purposes."
   scope: rgShared
   name: 'deploy-keyvault'
   params: {
-    keyVaultName: 'kv-ALZ-${environment}-001'
+    keyVaultName: 'kv-alz-${environment}-001'
     location: location
     tags: tags
     logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
@@ -633,7 +627,7 @@ module jumpbox 'modules/compute/vm-jumpbox.bicep' = { // "Create a jumpbox virtu
     subnetId: hubNetwork.outputs.managementSubnetId
     adminUsername: jumpboxAdminUsername
     adminPassword: jumpboxAdminPassword
-    vmSize: environment == 'prod' ? 'Standard_B2s' : 'Standard_B2s'  // Same for now, but parameterized for future
+    vmSize: environment == 'prod' ? 'Standard_B2s_v2' : 'Standard_B2s_v2'  // B2s_v2 replaces B2s (original no longer available in westeurope)
     logAnalyticsWorkspaceId: logAnalytics.outputs.workspaceId
     tags: tags
   }
@@ -667,16 +661,16 @@ module alerts 'modules/monitoring/alerts.bicep' = { // "Create monitoring alerts
 //
 // After deployment, run:
 //   az backup protection enable-for-vm \
-//     --vault-name rsv-ALZ-{env} \
+//     --vault-name rsv-alz-{env} \
 //     --resource-group rg-shared-weu \
 //     --vm vm-jump-hub-001 \
 //     --policy-name policy-daily-30d
 
-module recoveryVault 'modules/backup/recovery-vault.bicep' = { // "Create a Recovery Services Vault named 'rsv-ALZ-{environment}' in the shared resource group with the specified location, tags, and backup policy. The Recovery Services Vault will be used to manage backups for virtual machines in the landing zone. A daily backup policy with a retention period of 30 days will be created and associated with the vault. Note that VM backup registration (assigning VMs to the backup policy) is a separate operation that can be performed after deployment using Azure CLI or the Azure portal."
+module recoveryVault 'modules/backup/recovery-vault.bicep' = { // "Create a Recovery Services Vault named 'rsv-alz-{environment}' in the shared resource group with the specified location, tags, and backup policy. The Recovery Services Vault will be used to manage backups for virtual machines in the landing zone. A daily backup policy with a retention period of 30 days will be created and associated with the vault. Note that VM backup registration (assigning VMs to the backup policy) is a separate operation that can be performed after deployment using Azure CLI or the Azure portal."
   scope: rgShared
   name: 'deploy-recovery-vault'
   params: {
-    vaultName: 'rsv-ALZ-${environment}'
+    vaultName: 'rsv-alz-${environment}'
     location: location
     tags: tags
   }
