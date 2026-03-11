@@ -1,0 +1,3 @@
+Name,Peering sync status,Peering state,Remote virtual network name,Virtual network gateway or route server
+peer-vnet-hub-weu-to-vnet-spoke-prod-weu,Fully Synchronized,Connected,vnet-spoke-prod-weu,Enabled
+peer-vnet-hub-weu-to-vnet-spoke-dev-weu,Fully Synchronized,Connected,vnet-spoke-dev-weu,Enabled

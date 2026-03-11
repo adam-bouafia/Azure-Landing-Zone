@@ -42,13 +42,13 @@ subscriptions, without naming standards, it becomes chaos.
 
 ## Azure Naming Constraints to Know
 
-These are real constraints that will break your deployment if you ignore them:
+These are real constraints that will break our deployment if we ignore them:
 
 - **Storage Accounts**: 3-24 chars, lowercase + numbers only, **no dashes**. Globally unique.
 - **Key Vault**: 3-24 chars, alphanumeric + dashes. Globally unique.
 - **VMs**: 1-15 chars for Windows (NetBIOS limit), 1-64 for Linux.
 - **Resource Groups**: 1-90 chars, most special chars allowed.
-- **Subnets with fixed names**: `AzureFirewallSubnet`, `AzureBastionSubnet`, `GatewaySubnet` — Azure **requires** these exact names. You cannot rename them.
+- **Subnets with fixed names**: `AzureFirewallSubnet`, `AzureBastionSubnet`, `GatewaySubnet` - Azure **requires** these exact names. We cannot rename them.
 
 ## Region Abbreviations
 

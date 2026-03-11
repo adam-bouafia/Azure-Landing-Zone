@@ -5,10 +5,10 @@
 Tags are key-value pairs attached to Azure resources. They serve three critical purposes in a managed
 services environment:
 
-1. **Cost allocation**: Azure Cost Management can group costs by tag. Without tags, you get one big bill
+1. **Cost allocation**: Azure Cost Management can group costs by tag. Without tags, we get one big bill
    with no visibility into which team, project, or environment is spending what.
 2. **Operational automation**: Scripts can target resources by tag. Example: "stop all VMs tagged
-   `AutoShutdown=true` at 7 PM" — this is a cost optimization pattern.
+   `AutoShutdown=true` at 7 PM" - this is a cost optimization pattern.
 3. **Governance and compliance**: Azure Policy can enforce that resources without required tags are
    denied at creation time. This prevents "orphan" resources that nobody owns.
 
@@ -41,7 +41,7 @@ These are applied where relevant for automation and lifecycle management.
 Tags are defined once as a parameter object and passed to every resource and module:
 
 ```bicep
-// In main.bicep — defined once at the top
+// In main.bicep - defined once at the top
 param tags object = {
   Environment: 'Production'
   ManagedBy: 'Adam'

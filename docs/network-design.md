@@ -1,16 +1,16 @@
 # Network Design
 
-## Key Concepts — What All These Terms Mean
+## Key Concepts - What All These Terms Mean
 
 Before looking at the topology and address plan, let's define every networking term used in
 this document. If we already know what a VNet and a subnet are, feel free to skip ahead to
-the [topology diagram](#topology-hub-spoke). Otherwise, read through — each term builds on
+the [topology diagram](#topology-hub-spoke). Otherwise, read through - each term builds on
 the previous one.
 
 ### VNet (Virtual Network)
 
 A **Virtual Network** (VNet) is Azure's version of a traditional network. It's a logically
-isolated chunk of IP address space that lives entirely in the cloud. Think of it as your own
+isolated chunk of IP address space that lives entirely in the cloud. Think of it as our own
 private network inside Azure, resources we place inside a VNet can talk to each other by
 default, but they're invisible to the outside world unless we explicitly allow it.
 
@@ -22,7 +22,7 @@ Every VNet has an **address space**, a range of IP addresses it "owns." For exam
 
 ### Subnet
 
-A **subnet** is a subdivision of a VNet. we can't just dump all your resources into one big
+A **subnet** is a subdivision of a VNet. we can't just dump all our resources into one big
 VNet, we divide it into subnets to organize resources and apply different security rules to
 each group.
 
@@ -33,14 +33,14 @@ For example, we might have:
 
 Each subnet gets its own slice of the VNet's address space. A VNet with address space
 `10.0.0.0/16` might have a subnet `10.0.2.0/24` (256 addresses for web servers) and another
-`10.1.2.0/24` (256 addresses for app servers). The subnets don't overlap — they're distinct
+`10.1.2.0/24` (256 addresses for app servers). The subnets don't overlap - they're distinct
 portions of the larger VNet range.
 
 ![Hub-spoke network topology](https://www.patrickkoch.dev/images/post_26/architecture.png)
 
 ### Hub
 
-The **hub** is the central VNet in a hub-spoke topology. It doesn't run your application
+The **hub** is the central VNet in a hub-spoke topology. It doesn't run our application
 workloads. Instead, it holds **shared infrastructure services** that every other network needs
 to use:
 
@@ -56,7 +56,7 @@ through it to get where they need to go.
 ![Hub-spoke network topology](https://learn.microsoft.com/en-us/azure/architecture/networking/architecture/_images/hub-spoke.png)
 ### Spoke
 
-A **spoke** is a workload VNet where your actual applications, APIs, and databases live.
+A **spoke** is a workload VNet where our actual applications, APIs, and databases live.
 Each spoke is connected to the hub but **not directly to other spokes**. In our design:
 
 - **Spoke Production** (`10.1.0.0/16`) runs the live application
@@ -93,16 +93,16 @@ network.
 ### Azure Firewall
 
 **Azure Firewall** is a managed, cloud-native network security service that sits in the hub
-VNet and inspects all traffic flowing through it. It acts as the gatekeeper for your entire
+VNet and inspects all traffic flowing through it. It acts as the gatekeeper for our entire
 network.
 
 It can enforce three types of rules:
-- **Network rules** — allow or deny traffic based on source IP, destination IP, port, and
+- **Network rules** - allow or deny traffic based on source IP, destination IP, port, and
   protocol (e.g., "allow TCP 443 from spoke-prod to the internet")
-- **Application rules** — allow or deny traffic based on fully qualified domain names
+- **Application rules** - allow or deny traffic based on fully qualified domain names
   (e.g., "allow `*.ubuntu.com` for package updates, deny everything else")
-- **DNAT rules** — translate incoming public IP traffic to a private IP inside a spoke
-  (this is how external users reach your web servers without the servers having a public IP)
+- **DNAT rules** - translate incoming public IP traffic to a private IP inside a spoke
+  (this is how external users reach our web servers without the servers having a public IP)
 
 All traffic decisions are logged, so we have a full audit trail.
 
@@ -113,7 +113,7 @@ All traffic decisions are logged, so we have a full audit trail.
 ### DNAT (Destination Network Address Translation)
 
 **DNAT** is a firewall technique for handling inbound traffic from the internet. When someone
-on the internet accesses your application, they connect to the firewall's public IP address.
+on the internet accesses our application, they connect to the firewall's public IP address.
 The firewall then **translates** (rewrites) the destination address to the private IP of the
 actual web server inside a spoke.
 
@@ -123,17 +123,17 @@ Firewall rewrites destination to: 10.1.1.4 (web server's private IP)
 Web server responds back through the firewall
 ```
 
-This way, your web servers never need a public IP address. The firewall is the only thing
+This way, our web servers never need a public IP address. The firewall is the only thing
 with a public-facing address, and it controls exactly what traffic gets forwarded where.
 
 ![DNAT](https://blogger.googleusercontent.com/img/a/AVvXsEgdIQc8s_mGicNgKoSXUcI4D4BCzvbuRafLBeAdim3EEyxPA8o31qmCYxO2TMx18FnvlwAhYh1Q4_HE4xfpRk3rTXsxbGr3fi0lNARdoQ19A67VTUz5LOa2OODnxZTu1z3SIybuSXtpiVrMZObAJ030EdM_LB2OOEmBm1dg8mnMYe5tOjFArsRjZ_nOyDD4=w640-h194-rw)
 ### SNAT (Source Network Address Translation)
 
-**SNAT** is the opposite of DNAT — it handles **outbound** traffic. When a VM inside a spoke
+**SNAT** is the opposite of DNAT - it handles **outbound** traffic. When a VM inside a spoke
 needs to reach the internet (for example, to download a package update or call an external API),
 it has a private IP like `10.1.2.5` that means nothing on the public internet. Routers on the
-internet wouldn't know how to send a reply back to `10.1.2.5` — that address only exists
-inside your private network.
+internet wouldn't know how to send a reply back to `10.1.2.5` - that address only exists
+inside our private network.
 
 SNAT solves this by **rewriting the source address**. As the traffic passes through Azure Firewall
 on its way out, the firewall replaces the VM's private IP with the firewall's own public IP:
@@ -146,21 +146,21 @@ External server sends reply to 52.136.x.x
 Firewall receives reply, translates back to 10.1.2.5, forwards to the VM
 ```
 
-The VM never knows this happened — it just sees a response to its request. The external server
-never knows the VM's private IP either — it only sees the firewall's public IP.
+The VM never knows this happened - it just sees a response to its request. The external server
+never knows the VM's private IP either - it only sees the firewall's public IP.
 
 ![SNAT](https://blogger.googleusercontent.com/img/a/AVvXsEgzFZG_PDSfHTK9Oubwg7AJYjUlGUDyCLRoFQgBoVVtpK16NQiof_IAjNoVppSJ4fPD_UB8sTlKGb2ysA3LdM-ijBmlP-mDiZKMs3FvdX44Q-rrpox2sP-ku4yyKbt8TYPlGH_zYPeyZSED3EVEgJu0DzBstt9w8EziRwb-ehX-Doh9cAyMnMgPqytt6dTR=w640-h178-rw)
 
 
-**DNAT vs SNAT — the simple version:**
+**DNAT vs SNAT - the simple version:**
 
 | Direction | What it rewrites | When it's used |
 |-----------|-----------------|----------------|
-| **DNAT** | The **destination** address (incoming traffic) | Internet user → your web server |
-| **SNAT** | The **source** address (outgoing traffic) | Your VM → the internet |
+| **DNAT** | The **destination** address (incoming traffic) | Internet user → our web server |
+| **SNAT** | The **source** address (outgoing traffic) | Our VM → the internet |
 
 Both are forms of NAT (Network Address Translation). They just work in opposite directions.
-Together, they let your entire network share a single public IP while keeping all internal
+Together, they let our entire network share a single public IP while keeping all internal
 resources on private addresses.
 
 
@@ -168,12 +168,12 @@ resources on private addresses.
 
 ### Azure Bastion
 
-**Azure Bastion** is a managed service for secure remote access to your virtual machines.
-Normally, to SSH into a Linux VM or RDP into a Windows VM, you'd need to expose port 22
+**Azure Bastion** is a managed service for secure remote access to our virtual machines.
+Normally, to SSH into a Linux VM or RDP into a Windows VM, we'd need to expose port 22
 or 3389 to the internet, which is a massive security risk.
 
 Bastion eliminates that risk entirely:
-1. we open the Azure Portal in your browser
+1. we open the Azure Portal in our browser
 2. Click "Connect" on a VM
 3. Bastion creates a secure tunnel over HTTPS (port 443) through Azure's backbone
 4. we get a remote session directly in the browser, no public IP on the VM, no open
@@ -188,13 +188,13 @@ VMs in any peered spoke.
 ### GatewaySubnet (VPN / ExpressRoute)
 
 The **GatewaySubnet** is a special subnet reserved for Azure's virtual network gateways.
-It's where you'd place a **VPN Gateway** (encrypted tunnel over the public internet to your
-on-premises network) or an **ExpressRoute Gateway** (dedicated private connection to your
+It's where we'd place a **VPN Gateway** (encrypted tunnel over the public internet to our
+on-premises network) or an **ExpressRoute Gateway** (dedicated private connection to our
 on-premises network, provided by a telecom carrier).
 
 Azure requires this subnet to be named exactly `GatewaySubnet`. Even if we don't need
-on-premises connectivity today, reserving this subnet (we use `/27` — 32 addresses) means
-you're ready to add it later without redesigning your network.
+on-premises connectivity today, reserving this subnet (we use `/27` - 32 addresses) means
+we're ready to add it later without redesigning our network.
 
 
 ![Bastion](https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/images/expressroute-vpn-failover.svg)
@@ -202,9 +202,9 @@ you're ready to add it later without redesigning your network.
 ### Private Endpoint
 
 A **Private Endpoint** is a network interface that gives an Azure PaaS service (like Key Vault,
-Storage Account, or SQL Database) a **private IP address inside your VNet**.
+Storage Account, or SQL Database) a **private IP address inside our VNet**.
 
-Without Private Endpoints, when your app talks to Key Vault, the traffic goes:
+Without Private Endpoints, when our app talks to Key Vault, the traffic goes:
 
 ```
 Your VM → internet → Key Vault's public endpoint
@@ -216,8 +216,8 @@ With a Private Endpoint, the traffic stays entirely on the private network:
 Your VM → private IP (10.1.3.x) → Key Vault (privately)
 ```
 
-The PaaS service essentially "appears" inside your VNet with a private IP. The public endpoint
-can then be disabled entirely, so the service is only reachable from within your network.
+The PaaS service essentially "appears" inside our VNet with a private IP. The public endpoint
+can then be disabled entirely, so the service is only reachable from within our network.
 
 
 ![priv8](https://azure.microsoft.com/en-us/blog/wp-content/uploads/2019/09/6436278d-251a-48f0-9846-d9a01f3621b4.webp)
@@ -226,10 +226,10 @@ can then be disabled entirely, so the service is only reachable from within your
 
 When we create a Private Endpoint for, say, Key Vault, the hostname
 `kv-prod-001.vault.azure.net` still resolves to a public IP by default. A **Private DNS Zone**
-overrides this: it tells your VNets that `kv-prod-001.vault.azure.net` should resolve to the
+overrides this: it tells our VNets that `kv-prod-001.vault.azure.net` should resolve to the
 **private IP** of the Private Endpoint instead.
 
-Without it, your app would try to connect to the public IP and get blocked by your firewall
+Without it, our app would try to connect to the public IP and get blocked by our firewall
 rules. With it, DNS silently resolves to the private address and traffic flows internally.
 
 ![priv8](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/media/private-link-example-central-dns-multi-regions.png)
@@ -239,7 +239,7 @@ rules. With it, DNS silently resolves to the private address and traffic flows i
 
 **RFC 1918** is the internet standard that defines three IP address ranges reserved for private
 use. These ranges are guaranteed to never be used on the public internet, so we can use them
-freely inside your own networks without conflict:
+freely inside our own networks without conflict:
 
 | Range              | Size        | Common usage                         |
 |--------------------|-------------|--------------------------------------|
@@ -247,7 +247,7 @@ freely inside your own networks without conflict:
 | `172.16.0.0/12`    | 1 million   | Medium-sized private networks        |
 | `192.168.0.0/16`   | 65,536      | Home routers, small offices          |
 
-We use the `10.x.x.x` range because it gives us the most room — 16 million addresses to
+We use the `10.x.x.x` range because it gives us the most room - 16 million addresses to
 carve into VNets, subnets, and future expansions without ever worrying about running out.
 
 
@@ -295,8 +295,8 @@ growth: additional subnets for AKS, dedicated subnets for Private Endpoints, man
 ### Understanding CIDR Notation (the `/` number)
 
 Before diving into the address map, let's break down what those `/16`, `/24`, `/26` numbers
-actually mean. If you've ever looked at `10.0.1.0/24` and wondered what the `/24` part does,
-this section is for you.
+actually mean. If we've ever looked at `10.0.1.0/24` and wondered what the `/24` part does,
+this section is for us.
 
 #### IP addresses are just 32 bits
 
@@ -310,14 +310,14 @@ Here's what the computer actually sees:
 00001010 . 00000000 . 00000001 . 00000000
 ```
 
-Every IP address — whether it's `10.0.1.0` or `192.168.1.1` — is just 32 ones and zeros under the hood.
+Every IP address - whether it's `10.0.1.0` or `192.168.1.1` - is just 32 ones and zeros under the hood.
 The dot-decimal notation is simply a convenience so humans don't have to read binary.
 
 #### The `/` number splits those 32 bits into two parts
 
-The number after the slash is called the **prefix length**. It tells we how many of those 32 bits
+The number after the slash is called the **prefix length**. It tells us how many of those 32 bits
 belong to the **network portion** (the part that stays the same for every device in that network).
-The remaining bits are the **host portion** (the part that changes — each device gets a unique value).
+The remaining bits are the **host portion** (the part that changes - each device gets a unique value).
 
 - **Left side** (network bits) = locked, identical for every address in this network
 - **Right side** (host bits) = free, each device or resource gets a unique combination
@@ -325,7 +325,7 @@ The remaining bits are the **host portion** (the part that changes — each devi
 Think of it like a street address: the network bits are the street name (same for everyone on that
 street), and the host bits are the house number (unique per household).
 
-#### /24 — the most common and easiest to understand
+#### /24 - the most common and easiest to understand
 
 A `/24` means 24 bits are locked for the network, leaving 8 bits free for hosts:
 
@@ -339,10 +339,10 @@ A `/24` means 24 bits are locked for the network, leaving 8 bits free for hosts:
 With 8 free bits, each bit can be 0 or 1, so we get 2^8 = **256 possible addresses**
 (from `10.0.1.0` through `10.0.1.255`).
 
-This is the default "small subnet" in most networks. You'll see it used for individual subnets
+This is the default "small subnet" in most networks. We'll see it used for individual subnets
 like our web, app, and data tiers in the spoke VNets.
 
-#### /16 — a large network
+#### /16 - a large network
 
 A `/16` locks only 16 bits, leaving 16 bits free:
 
@@ -353,12 +353,12 @@ A `/16` locks only 16 bits, leaving 16 bits free:
 ├─ 16 bits: LOCKED ┤ ├─ 16 bits: FREE ─┤
 ```
 
-16 free bits gives we 2^16 = **65,536 addresses** (from `10.0.0.0` through `10.0.255.255`).
+16 free bits gives us 2^16 = **65,536 addresses** (from `10.0.0.0` through `10.0.255.255`).
 
-This is why we use `/16` for each VNet's overall address space — it gives us plenty of room
+This is why we use `/16` for each VNet's overall address space - it gives us plenty of room
 to carve out many subnets inside it without ever running out of addresses.
 
-#### /26 — a smaller subnet
+#### /26 - a smaller subnet
 
 A `/26` locks 26 bits, leaving only 6 bits free:
 
@@ -369,13 +369,13 @@ A `/26` locks 26 bits, leaving only 6 bits free:
 ├──── 26 bits: LOCKED ───────┤ ├ 6 FREE ┤
 ```
 
-6 free bits gives we 2^6 = **64 addresses** (from `10.0.1.0` through `10.0.1.63`).
+6 free bits gives us 2^6 = **64 addresses** (from `10.0.1.0` through `10.0.1.63`).
 
 We use `/26` for subnets like Azure Firewall and Azure Bastion. These services don't need
-hundreds of IPs, so a 64-address block is the right size — large enough to meet Azure's
+hundreds of IPs, so a 64-address block is the right size - large enough to meet Azure's
 minimum requirements, small enough not to waste space.
 
-#### /27 — even smaller
+#### /27 - even smaller
 
 A `/27` locks 27 bits, leaving just 5 bits free:
 
@@ -386,7 +386,7 @@ A `/27` locks 27 bits, leaving just 5 bits free:
 ├───── 27 bits: LOCKED ───────┤ ├ 5 FREE ┤
 ```
 
-5 free bits gives we 2^5 = **32 addresses** (from `10.0.4.0` through `10.0.4.31`).
+5 free bits gives us 2^5 = **32 addresses** (from `10.0.4.0` through `10.0.4.31`).
 
 We use `/27` for the GatewaySubnet. Azure requires this subnet to exist for VPN or
 ExpressRoute gateways, but it only needs a small number of IPs.
@@ -411,7 +411,7 @@ Here's a quick reference table:
 
 **Key insight:** a bigger number after `/` means more bits are locked for the network,
 which means fewer bits are free for hosts, which means a **smaller** network.
-Conversely, a smaller prefix like `/16` gives we a much larger address space.
+Conversely, a smaller prefix like `/16` gives us a much larger address space.
 
 That's all CIDR notation is. One formula: `2 ^ (32 - n)`. Now when we see `/26` in the
 address map below, we know exactly what it means: 26 bits locked, 6 bits free, 64 total
@@ -435,12 +435,12 @@ addresses, 59 usable in Azure.
 ### Why Azure reserves 5 IPs per subnet
 
 In every subnet, Azure reserves the first 4 and last 1 addresses:
-- `.0` — Network address
-- `.1` — Default gateway
-- `.2`, `.3` — Azure DNS mapping
-- Last IP — Broadcast address
+- `.0` - Network address
+- `.1` - Default gateway
+- `.2`, `.3` - Azure DNS mapping
+- Last IP - Broadcast address
 
-So a /24 (256 addresses) gives we 251 usable. A /26 (64 addresses) gives 59.
+So a /24 (256 addresses) gives us 251 usable. A /26 (64 addresses) gives 59.
 
 ## Traffic Flow
 
@@ -469,7 +469,7 @@ VM in spoke-prod → peering → hub → Azure Firewall → hub → peering → 
 ```
 
 Spokes cannot talk directly. All cross-spoke traffic routes through the hub firewall.
-This is intentional — the firewall enforces that prod can't accidentally access dev, etc.
+This is intentional - the firewall enforces that prod can't accidentally access dev, etc.
 
 ### Management Access (Bastion)
 

@@ -24,6 +24,9 @@ Thumbs.db
 *.env
 credentials.json
 
+# MkDocs build output
+site/
+
 # Claude Code
 .claude/
 

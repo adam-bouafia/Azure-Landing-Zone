@@ -12,7 +12,7 @@ This document showcase the key architectural decision made during the design and
 
 **Rationale**:
 - Virtual WAN is designed for large-scale (10+ spokes) or branch-heavy topologies. In our project we use only 2 spokes, it would be overkill.
-- Hub-spoke gives us full control over routing and firewall rules. With Virtual WAN, Microsoft manages the hub router and you lose some granularity.
+- Hub-spoke gives us full control over routing and firewall rules. With Virtual WAN, Microsoft manages the hub router and we lose some granularity.
 - Lower cost: no Virtual WAN hub fee (~€0.05/hr = ~€36/month) on top of the firewall cost.
 
 ---
@@ -47,7 +47,7 @@ This document showcase the key architectural decision made during the design and
 - Audit trail: RBAC changes show up in Azure Activity Log alongside all other RBAC changes. 
 The problem it's solving:
 
-You have a client with 50 Azure resources. Security team wants to audit "who changed permissions on what, and when?" They open Azure Activity Log — that's Azure's central record of every management action.
+We have a client with 50 Azure resources. Security team wants to audit "who changed permissions on what, and when?" They open Azure Activity Log - that's Azure's central record of every management action.
 
 With RBAC (what we use):
 
@@ -60,7 +60,7 @@ One place. One query. Full picture.
 
 With the old Access Policies:
 
-Key Vault had its own permission system, completely separate. When someone got added to a Key Vault access policy, that event went into a different log stream — Key Vault diagnostic logs, not Activity Log.
+Key Vault had its own permission system, completely separate. When someone got added to a Key Vault access policy, that event went into a different log stream - Key Vault diagnostic logs, not Activity Log.
 
 So the auditor would have to:
 
@@ -69,7 +69,7 @@ Also check Key Vault's own logs for access policy changes
 Mentally combine them
 The real-world problem this causes:
 
-"Who had access to the client's Key Vault last Tuesday?" becomes a pain. You're searching two different systems instead of one.
+"Who had access to the client's Key Vault last Tuesday?" becomes a pain. We're searching two different systems instead of one.
 
 ---
 
@@ -102,4 +102,4 @@ The real-world problem this causes:
 - In production, these are always-on. In dev/test, deploy to verify, screenshot, then tear down.
 
 **Trade-offs accepted**: Conditional deployment adds `if` checks to outputs, which means downstream modules need to handle "resource not deployed" scenarios .
-The flag saves money during dev, but the cost is that your code gets more complex because every module that depends on a conditional resource has to handle "what if that resource doesn't exist?"
+The flag saves money during dev, but the cost is that our code gets more complex because every module that depends on a conditional resource has to handle "what if that resource doesn't exist?"

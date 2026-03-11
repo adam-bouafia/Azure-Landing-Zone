@@ -1,0 +1,78 @@
+site_name: Azure Landing Zone
+site_description: A production Azure Landing Zone built in Bicep, documented as a learning guide for Azure infrastructure.
+site_author: Adam Bouafia
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - content.tabs.link
+    - search.suggest
+    - search.highlight
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/adam-bouafia
+      name: Adam Bouafia on LinkedIn
+    - icon: fontawesome/brands/github
+      link: https://adam-bouafia.github.io/
+      name: Adam Bouafia Portfolio
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Architecture:
+    - Network Design: network-design.md
+    - Naming Convention: naming-strategy.md
+    - Architecture Decisions: stack-decisions.md
+    - Roadmap: roadmap-construction.md
+  - Operations:
+    - Tagging Strategy: tagging-strategy.md
+    - Azure Policies: azure-policies.md
+    - CI/CD Pipeline: ci-cd-pipeline.md
+  - Deployment:
+    - Deployment Guide: deployment-guide.md
+    - Troubleshooting: troubleshooting.md
+  - Reference:
+    - Resource Inventory: resource-inventory.md
+    - Screenshots Gallery: screenshots-gallery.md

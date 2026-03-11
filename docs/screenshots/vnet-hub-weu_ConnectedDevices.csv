@@ -1,0 +1,4 @@
+Device,Type,IP Address,Subnet
+afw-hub-weu,Firewall,10.0.1.4,AzureFirewallSubnet
+nic-vm-jump-hub-001,Network interface,10.0.3.4,snet-management
+bas-hub-weu,Bastion,-,AzureBastionSubnet
