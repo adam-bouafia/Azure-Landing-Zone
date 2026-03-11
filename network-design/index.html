@@ -1,0 +1,2355 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A production Azure Landing Zone built in Bicep, documented as a learning guide for Azure infrastructure.">
+      
+      
+        <meta name="author" content="Adam Bouafia">
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../naming-strategy/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>Network Design - Azure Landing Zone</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#network-design" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Azure Landing Zone" class="md-header__button md-logo" aria-label="Azure Landing Zone" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Azure Landing Zone
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Network Design
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tagging-strategy/" class="md-tabs__link">
+          
+  
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../deployment-guide/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../resource-inventory/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Azure Landing Zone" class="md-nav__button md-logo" aria-label="Azure Landing Zone" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Azure Landing Zone
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Design
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#key-concepts-what-all-these-terms-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Concepts - What All These Terms Mean
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Concepts - What All These Terms Mean">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vnet-virtual-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VNet (Virtual Network)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Subnet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spoke
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#peering-vnet-peering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peering (VNet Peering)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dnat-destination-network-address-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNAT (Destination Network Address Translation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#snat-source-network-address-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SNAT (Source Network Address Translation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-bastion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Bastion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatewaysubnet-vpn-expressroute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GatewaySubnet (VPN / ExpressRoute)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#private-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Private Endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#private-dns-zone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Private DNS Zone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rfc-1918-private-ip-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RFC 1918 (Private IP Space)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#topology-hub-spoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topology: Hub-Spoke
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ip-addressing-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IP Addressing Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IP Addressing Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-16-per-vnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why /16 per VNet?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#understanding-cidr-notation-the-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding CIDR Notation (the / number)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding CIDR Notation (the / number)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ip-addresses-are-just-32-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IP addresses are just 32 bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-number-splits-those-32-bits-into-two-parts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The / number splits those 32 bits into two parts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-the-most-common-and-easiest-to-understand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /24 - the most common and easiest to understand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#16-a-large-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /16 - a large network
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-a-smaller-subnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /26 - a smaller subnet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-even-smaller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /27 - even smaller
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-formula" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The formula
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-address-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Address Map
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-azure-reserves-5-ips-per-subnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Azure reserves 5 IPs per subnet
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#traffic-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Traffic Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Traffic Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spoke-to-internet-outbound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spoke-to-Internet (Outbound)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internet-to-spoke-inbound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internet-to-Spoke (Inbound)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spoke-to-spoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spoke-to-Spoke
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#management-access-bastion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Management Access (Bastion)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-resolution-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS Resolution Strategy
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../naming-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming Convention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stack-decisions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap-construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tagging-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tagging Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../azure-policies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Azure Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ci-cd-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-inventory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resource Inventory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../screenshots-gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Screenshots Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#key-concepts-what-all-these-terms-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Concepts - What All These Terms Mean
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Concepts - What All These Terms Mean">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vnet-virtual-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VNet (Virtual Network)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Subnet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spoke
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#peering-vnet-peering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peering (VNet Peering)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dnat-destination-network-address-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNAT (Destination Network Address Translation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#snat-source-network-address-translation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SNAT (Source Network Address Translation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-bastion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Bastion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatewaysubnet-vpn-expressroute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GatewaySubnet (VPN / ExpressRoute)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#private-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Private Endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#private-dns-zone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Private DNS Zone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rfc-1918-private-ip-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RFC 1918 (Private IP Space)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#topology-hub-spoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topology: Hub-Spoke
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ip-addressing-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IP Addressing Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IP Addressing Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-16-per-vnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why /16 per VNet?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#understanding-cidr-notation-the-number" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding CIDR Notation (the / number)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding CIDR Notation (the / number)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ip-addresses-are-just-32-bits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IP addresses are just 32 bits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-number-splits-those-32-bits-into-two-parts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The / number splits those 32 bits into two parts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-the-most-common-and-easiest-to-understand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /24 - the most common and easiest to understand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#16-a-large-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /16 - a large network
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-a-smaller-subnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /26 - a smaller subnet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-even-smaller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /27 - even smaller
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-formula" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The formula
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-address-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Address Map
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-azure-reserves-5-ips-per-subnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Azure reserves 5 IPs per subnet
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#traffic-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Traffic Flow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Traffic Flow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spoke-to-internet-outbound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spoke-to-Internet (Outbound)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internet-to-spoke-inbound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internet-to-Spoke (Inbound)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spoke-to-spoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spoke-to-Spoke
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#management-access-bastion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Management Access (Bastion)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dns-resolution-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DNS Resolution Strategy
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="network-design">Network Design<a class="headerlink" href="#network-design" title="Permanent link">&para;</a></h1>
+<h2 id="key-concepts-what-all-these-terms-mean">Key Concepts - What All These Terms Mean<a class="headerlink" href="#key-concepts-what-all-these-terms-mean" title="Permanent link">&para;</a></h2>
+<p>Before looking at the topology and address plan, let's define every networking term used in
+this document. If we already know what a VNet and a subnet are, feel free to skip ahead to
+the <a href="#topology-hub-spoke">topology diagram</a>. Otherwise, read through - each term builds on
+the previous one.</p>
+<h3 id="vnet-virtual-network">VNet (Virtual Network)<a class="headerlink" href="#vnet-virtual-network" title="Permanent link">&para;</a></h3>
+<p>A <strong>Virtual Network</strong> (VNet) is Azure's version of a traditional network. It's a logically
+isolated chunk of IP address space that lives entirely in the cloud. Think of it as our own
+private network inside Azure, resources we place inside a VNet can talk to each other by
+default, but they're invisible to the outside world unless we explicitly allow it.</p>
+<p>Every VNet has an <strong>address space</strong>, a range of IP addresses it "owns." For example,
+<code>10.0.0.0/16</code> means this VNet controls all 65,536 addresses from <code>10.0.0.0</code> to <code>10.0.255.255</code>.</p>
+<p><img alt="Hub-spoke network topology" src="https://miro.medium.com/1*9dpxSaew3flbzVc-67jXtA.gif" /></p>
+<h3 id="subnet">Subnet<a class="headerlink" href="#subnet" title="Permanent link">&para;</a></h3>
+<p>A <strong>subnet</strong> is a subdivision of a VNet. we can't just dump all our resources into one big
+VNet, we divide it into subnets to organize resources and apply different security rules to
+each group.</p>
+<p>For example, we might have:
+- A subnet for web servers (public-facing)
+- A subnet for application servers (internal logic)
+- A subnet for databases (most restricted)</p>
+<p>Each subnet gets its own slice of the VNet's address space. A VNet with address space
+<code>10.0.0.0/16</code> might have a subnet <code>10.0.2.0/24</code> (256 addresses for web servers) and another
+<code>10.1.2.0/24</code> (256 addresses for app servers). The subnets don't overlap - they're distinct
+portions of the larger VNet range.</p>
+<p><img alt="Hub-spoke network topology" src="https://www.patrickkoch.dev/images/post_26/architecture.png" /></p>
+<h3 id="hub">Hub<a class="headerlink" href="#hub" title="Permanent link">&para;</a></h3>
+<p>The <strong>hub</strong> is the central VNet in a hub-spoke topology. It doesn't run our application
+workloads. Instead, it holds <strong>shared infrastructure services</strong> that every other network needs
+to use:</p>
+<ul>
+<li><strong>Firewalls</strong>: to inspect and filter all traffic</li>
+<li><strong>Bastion hosts</strong>: to provide secure remote access to VMs</li>
+<li><strong>VPN/ExpressRoute gateways</strong>: to connect to on-premises networks</li>
+<li><strong>Management tools</strong>: jumpboxes, monitoring agents, etc.</li>
+</ul>
+<p>Think of it like the lobby of an office building: we don't do work there, but everyone passes
+through it to get where they need to go.</p>
+<p><img alt="Hub-spoke network topology" src="https://learn.microsoft.com/en-us/azure/architecture/networking/architecture/_images/hub-spoke.png" /></p>
+<h3 id="spoke">Spoke<a class="headerlink" href="#spoke" title="Permanent link">&para;</a></h3>
+<p>A <strong>spoke</strong> is a workload VNet where our actual applications, APIs, and databases live.
+Each spoke is connected to the hub but <strong>not directly to other spokes</strong>. In our design:</p>
+<ul>
+<li><strong>Spoke Production</strong> (<code>10.1.0.0/16</code>) runs the live application</li>
+<li><strong>Spoke Development</strong> (<code>10.2.0.0/16</code>) runs the dev/test environment</li>
+</ul>
+<p>This separation is intentional. If a developer accidentally misconfigures something in dev,
+it cannot affect production because the two spokes have no direct link. Any traffic between
+them must pass through the hub's firewall, which enforces strict rules.</p>
+<p><img alt="Hub-spoke network topology" src="https://learn.microsoft.com/en-us/azure/architecture/networking/architecture/_images/spoke-spoke-routing.png" /></p>
+<h3 id="peering-vnet-peering">Peering (VNet Peering)<a class="headerlink" href="#peering-vnet-peering" title="Permanent link">&para;</a></h3>
+<p><strong>VNet peering</strong> is the connection between two VNets. By default, VNets are completely
+isolated, even if two VNets are in the same Azure subscription, resources in one can't talk
+to resources in the other. Peering links them so traffic can flow between them over Azure's
+private backbone (not the internet).</p>
+<p>In a hub-spoke topology, each spoke is peered with the hub. The spokes are <strong>not</strong> peered
+with each other. This forces all cross-spoke traffic through the hub, where the firewall
+can inspect it.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Spoke Prod ←──peering──→ Hub ←──peering──→ Spoke Dev
+</code></pre></div>
+<p>Peering is fast (Azure backbone speeds), low-latency, and the traffic never leaves Microsoft's
+network.</p>
+<p><img alt="Peering" src="https://learn.microsoft.com/en-us/azure/architecture/networking/architecture/_images/spoke-spoke-routing.png" /></p>
+<h3 id="azure-firewall">Azure Firewall<a class="headerlink" href="#azure-firewall" title="Permanent link">&para;</a></h3>
+<p><strong>Azure Firewall</strong> is a managed, cloud-native network security service that sits in the hub
+VNet and inspects all traffic flowing through it. It acts as the gatekeeper for our entire
+network.</p>
+<p>It can enforce three types of rules:
+- <strong>Network rules</strong> - allow or deny traffic based on source IP, destination IP, port, and
+  protocol (e.g., "allow TCP 443 from spoke-prod to the internet")
+- <strong>Application rules</strong> - allow or deny traffic based on fully qualified domain names
+  (e.g., "allow <code>*.ubuntu.com</code> for package updates, deny everything else")
+- <strong>DNAT rules</strong> - translate incoming public IP traffic to a private IP inside a spoke
+  (this is how external users reach our web servers without the servers having a public IP)</p>
+<p>All traffic decisions are logged, so we have a full audit trail.</p>
+<p><img alt="Peering" src="https://kodekloud.com/kk-media/image/upload/v1752882189/notes-assets/images/Microsoft-Azure-Security-Technologies-AZ-500-Implementing-Azure-Firewall/azure-firewall-implementation-diagram-2.jpg" /></p>
+<h3 id="dnat-destination-network-address-translation">DNAT (Destination Network Address Translation)<a class="headerlink" href="#dnat-destination-network-address-translation" title="Permanent link">&para;</a></h3>
+<p><strong>DNAT</strong> is a firewall technique for handling inbound traffic from the internet. When someone
+on the internet accesses our application, they connect to the firewall's public IP address.
+The firewall then <strong>translates</strong> (rewrites) the destination address to the private IP of the
+actual web server inside a spoke.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>User hits: 52.136.x.x (firewall&#39;s public IP)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Firewall rewrites destination to: 10.1.1.4 (web server&#39;s private IP)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Web server responds back through the firewall
+</code></pre></div>
+<p>This way, our web servers never need a public IP address. The firewall is the only thing
+with a public-facing address, and it controls exactly what traffic gets forwarded where.</p>
+<p><img alt="DNAT" src="https://blogger.googleusercontent.com/img/a/AVvXsEgdIQc8s_mGicNgKoSXUcI4D4BCzvbuRafLBeAdim3EEyxPA8o31qmCYxO2TMx18FnvlwAhYh1Q4_HE4xfpRk3rTXsxbGr3fi0lNARdoQ19A67VTUz5LOa2OODnxZTu1z3SIybuSXtpiVrMZObAJ030EdM_LB2OOEmBm1dg8mnMYe5tOjFArsRjZ_nOyDD4=w640-h194-rw" /></p>
+<h3 id="snat-source-network-address-translation">SNAT (Source Network Address Translation)<a class="headerlink" href="#snat-source-network-address-translation" title="Permanent link">&para;</a></h3>
+<p><strong>SNAT</strong> is the opposite of DNAT - it handles <strong>outbound</strong> traffic. When a VM inside a spoke
+needs to reach the internet (for example, to download a package update or call an external API),
+it has a private IP like <code>10.1.2.5</code> that means nothing on the public internet. Routers on the
+internet wouldn't know how to send a reply back to <code>10.1.2.5</code> - that address only exists
+inside our private network.</p>
+<p>SNAT solves this by <strong>rewriting the source address</strong>. As the traffic passes through Azure Firewall
+on its way out, the firewall replaces the VM's private IP with the firewall's own public IP:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>VM sends from:    10.1.2.5 (private, meaningless on the internet)
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Firewall rewrites source to: 52.136.x.x (firewall&#39;s public IP)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>External server sees the request as coming from 52.136.x.x
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>External server sends reply to 52.136.x.x
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>Firewall receives reply, translates back to 10.1.2.5, forwards to the VM
+</code></pre></div>
+<p>The VM never knows this happened - it just sees a response to its request. The external server
+never knows the VM's private IP either - it only sees the firewall's public IP.</p>
+<p><img alt="SNAT" src="https://blogger.googleusercontent.com/img/a/AVvXsEgzFZG_PDSfHTK9Oubwg7AJYjUlGUDyCLRoFQgBoVVtpK16NQiof_IAjNoVppSJ4fPD_UB8sTlKGb2ysA3LdM-ijBmlP-mDiZKMs3FvdX44Q-rrpox2sP-ku4yyKbt8TYPlGH_zYPeyZSED3EVEgJu0DzBstt9w8EziRwb-ehX-Doh9cAyMnMgPqytt6dTR=w640-h178-rw" /></p>
+<p><strong>DNAT vs SNAT - the simple version:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>What it rewrites</th>
+<th>When it's used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DNAT</strong></td>
+<td>The <strong>destination</strong> address (incoming traffic)</td>
+<td>Internet user → our web server</td>
+</tr>
+<tr>
+<td><strong>SNAT</strong></td>
+<td>The <strong>source</strong> address (outgoing traffic)</td>
+<td>Our VM → the internet</td>
+</tr>
+</tbody>
+</table>
+<p>Both are forms of NAT (Network Address Translation). They just work in opposite directions.
+Together, they let our entire network share a single public IP while keeping all internal
+resources on private addresses.</p>
+<p><img alt="DNAT-vs-SNAT" src="https://blogger.googleusercontent.com/img/a/AVvXsEiCixZXHAr5hDrdSwYoBDJY_WCMNoQzP2xmBse_6IJvYRIiIGL0wFtXX_2NKulbQ5fYX-kL6eoUhnieP5wRCMm-Do2WQDbWiMKZiLbKVM2vGteOpcbcoeebuodL1H4vAqsLze7CSPQT1y5BKOv8AsBRcjpN7ALk3k7JOJHPln_4jxyNcUIru1Smoli4CyJ4" /></p>
+<h3 id="azure-bastion">Azure Bastion<a class="headerlink" href="#azure-bastion" title="Permanent link">&para;</a></h3>
+<p><strong>Azure Bastion</strong> is a managed service for secure remote access to our virtual machines.
+Normally, to SSH into a Linux VM or RDP into a Windows VM, we'd need to expose port 22
+or 3389 to the internet, which is a massive security risk.</p>
+<p>Bastion eliminates that risk entirely:
+1. we open the Azure Portal in our browser
+2. Click "Connect" on a VM
+3. Bastion creates a secure tunnel over HTTPS (port 443) through Azure's backbone
+4. we get a remote session directly in the browser, no public IP on the VM, no open
+   management ports, no VPN client needed</p>
+<p>Bastion lives in a dedicated subnet (<code>AzureBastionSubnet</code>) in the hub VNet and can reach
+VMs in any peered spoke.</p>
+<p><img alt="Bastion" src="https://imgopt.infoq.com/fit-in/3000x4000/filters:quality(85)/filters:no_upscale()/news/2019/06/Azure-Bastion-VM/en/resources/2architecture-1561226707732.png" /></p>
+<h3 id="gatewaysubnet-vpn-expressroute">GatewaySubnet (VPN / ExpressRoute)<a class="headerlink" href="#gatewaysubnet-vpn-expressroute" title="Permanent link">&para;</a></h3>
+<p>The <strong>GatewaySubnet</strong> is a special subnet reserved for Azure's virtual network gateways.
+It's where we'd place a <strong>VPN Gateway</strong> (encrypted tunnel over the public internet to our
+on-premises network) or an <strong>ExpressRoute Gateway</strong> (dedicated private connection to our
+on-premises network, provided by a telecom carrier).</p>
+<p>Azure requires this subnet to be named exactly <code>GatewaySubnet</code>. Even if we don't need
+on-premises connectivity today, reserving this subnet (we use <code>/27</code> - 32 addresses) means
+we're ready to add it later without redesigning our network.</p>
+<p><img alt="Bastion" src="https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/images/expressroute-vpn-failover.svg" /></p>
+<h3 id="private-endpoint">Private Endpoint<a class="headerlink" href="#private-endpoint" title="Permanent link">&para;</a></h3>
+<p>A <strong>Private Endpoint</strong> is a network interface that gives an Azure PaaS service (like Key Vault,
+Storage Account, or SQL Database) a <strong>private IP address inside our VNet</strong>.</p>
+<p>Without Private Endpoints, when our app talks to Key Vault, the traffic goes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Your VM → internet → Key Vault&#39;s public endpoint
+</code></pre></div>
+<p>With a Private Endpoint, the traffic stays entirely on the private network:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Your VM → private IP (10.1.3.x) → Key Vault (privately)
+</code></pre></div>
+<p>The PaaS service essentially "appears" inside our VNet with a private IP. The public endpoint
+can then be disabled entirely, so the service is only reachable from within our network.</p>
+<p><img alt="priv8" src="https://azure.microsoft.com/en-us/blog/wp-content/uploads/2019/09/6436278d-251a-48f0-9846-d9a01f3621b4.webp" /></p>
+<h3 id="private-dns-zone">Private DNS Zone<a class="headerlink" href="#private-dns-zone" title="Permanent link">&para;</a></h3>
+<p>When we create a Private Endpoint for, say, Key Vault, the hostname
+<code>kv-prod-001.vault.azure.net</code> still resolves to a public IP by default. A <strong>Private DNS Zone</strong>
+overrides this: it tells our VNets that <code>kv-prod-001.vault.azure.net</code> should resolve to the
+<strong>private IP</strong> of the Private Endpoint instead.</p>
+<p>Without it, our app would try to connect to the public IP and get blocked by our firewall
+rules. With it, DNS silently resolves to the private address and traffic flows internally.</p>
+<p><img alt="priv8" src="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/media/private-link-example-central-dns-multi-regions.png" /></p>
+<h3 id="rfc-1918-private-ip-space">RFC 1918 (Private IP Space)<a class="headerlink" href="#rfc-1918-private-ip-space" title="Permanent link">&para;</a></h3>
+<p><strong>RFC 1918</strong> is the internet standard that defines three IP address ranges reserved for private
+use. These ranges are guaranteed to never be used on the public internet, so we can use them
+freely inside our own networks without conflict:</p>
+<table>
+<thead>
+<tr>
+<th>Range</th>
+<th>Size</th>
+<th>Common usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>10.0.0.0/8</code></td>
+<td>16 million</td>
+<td>Enterprise / cloud networks (we use this)</td>
+</tr>
+<tr>
+<td><code>172.16.0.0/12</code></td>
+<td>1 million</td>
+<td>Medium-sized private networks</td>
+</tr>
+<tr>
+<td><code>192.168.0.0/16</code></td>
+<td>65,536</td>
+<td>Home routers, small offices</td>
+</tr>
+</tbody>
+</table>
+<p>We use the <code>10.x.x.x</code> range because it gives us the most room - 16 million addresses to
+carve into VNets, subnets, and future expansions without ever worrying about running out.</p>
+<p><img alt="rfc" src="https://static.packt-cdn.com/products/9781789340501/graphics/assets/e3bf647a-f2b1-4d81-ae69-512dbaa160c9.png" /></p>
+<hr />
+<h2 id="topology-hub-spoke">Topology: Hub-Spoke<a class="headerlink" href="#topology-hub-spoke" title="Permanent link">&para;</a></h2>
+<p>Now that we know what all these pieces are, here's how they fit together. See
+<a href="../stack-decisions/">ADR-001</a> for why we chose hub-spoke over Virtual WAN.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>                        ┌──────────────────────────────────────┐
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>                        │         Hub VNet (10.0.0.0/16)       │
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>                        │                                      │
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>                        │  ┌──────────────┐ ┌────────────────┐ │
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>                        │  │ AzureFirewall│ │ AzureBastion   │ │
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>                        │  │ 10.0.1.0/26  │ │ 10.0.2.0/26    │ │
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>                        │  └──────────────┘ └────────────────┘ │
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>                        │  ┌──────────────┐ ┌────────────────┐ │
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>                        │  │ Management   │ │ GatewaySubnet  │ │
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>                        │  │ 10.0.3.0/24  │ │ 10.0.4.0/27    │ │
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>                        │  └──────────────┘ └────────────────┘ │
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>                        └──────┬─────────────────────┬─────────┘
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>                               │ Peering             │ Peering
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>                 ┌─────────────┴───────┐  ┌──────────┴─────────────┐
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>                 │ Spoke: Production   │  │ Spoke: Development     │
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>                 │ (10.1.0.0/16)       │  │ (10.2.0.0/16)          │
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>                 │                     │  │                        │
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>                 │ Web  10.1.1.0/24    │  │ Web  10.2.1.0/24       │
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>                 │ App  10.1.2.0/24    │  │ App  10.2.2.0/24       │
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>                 │ Data 10.1.3.0/24    │  │ Data 10.2.3.0/24       │
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>                 └─────────────────────┘  └────────────────────────┘
+</code></pre></div>
+<h2 id="ip-addressing-plan">IP Addressing Plan<a class="headerlink" href="#ip-addressing-plan" title="Permanent link">&para;</a></h2>
+<h3 id="why-16-per-vnet">Why /16 per VNet?<a class="headerlink" href="#why-16-per-vnet" title="Permanent link">&para;</a></h3>
+<p>Private IP space (RFC 1918) is free. Being stingy causes pain later when we need more subnets.
+A /16 gives 65,536 addresses per VNet. We use a tiny fraction now, but the space is reserved for
+growth: additional subnets for AKS, dedicated subnets for Private Endpoints, management tools, etc.</p>
+<h3 id="understanding-cidr-notation-the-number">Understanding CIDR Notation (the <code>/</code> number)<a class="headerlink" href="#understanding-cidr-notation-the-number" title="Permanent link">&para;</a></h3>
+<p>Before diving into the address map, let's break down what those <code>/16</code>, <code>/24</code>, <code>/26</code> numbers
+actually mean. If we've ever looked at <code>10.0.1.0/24</code> and wondered what the <code>/24</code> part does,
+this section is for us.</p>
+<h4 id="ip-addresses-are-just-32-bits">IP addresses are just 32 bits<a class="headerlink" href="#ip-addresses-are-just-32-bits" title="Permanent link">&para;</a></h4>
+<p>An IP address like <code>10.0.1.0</code> is a human-friendly way of writing a 32-bit binary number.
+Each of the four numbers separated by dots (called <strong>octets</strong>) is 8 bits, and 4 x 8 = 32 bits total.</p>
+<p>Here's what the computer actually sees:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>10  .  0  .  1  .  0
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>00001010 . 00000000 . 00000001 . 00000000
+</code></pre></div>
+<p>Every IP address - whether it's <code>10.0.1.0</code> or <code>192.168.1.1</code> - is just 32 ones and zeros under the hood.
+The dot-decimal notation is simply a convenience so humans don't have to read binary.</p>
+<h4 id="the-number-splits-those-32-bits-into-two-parts">The <code>/</code> number splits those 32 bits into two parts<a class="headerlink" href="#the-number-splits-those-32-bits-into-two-parts" title="Permanent link">&para;</a></h4>
+<p>The number after the slash is called the <strong>prefix length</strong>. It tells us how many of those 32 bits
+belong to the <strong>network portion</strong> (the part that stays the same for every device in that network).
+The remaining bits are the <strong>host portion</strong> (the part that changes - each device gets a unique value).</p>
+<ul>
+<li><strong>Left side</strong> (network bits) = locked, identical for every address in this network</li>
+<li><strong>Right side</strong> (host bits) = free, each device or resource gets a unique combination</li>
+</ul>
+<p>Think of it like a street address: the network bits are the street name (same for everyone on that
+street), and the host bits are the house number (unique per household).</p>
+<h4 id="24-the-most-common-and-easiest-to-understand">/24 - the most common and easiest to understand<a class="headerlink" href="#24-the-most-common-and-easiest-to-understand" title="Permanent link">&para;</a></h4>
+<p>A <code>/24</code> means 24 bits are locked for the network, leaving 8 bits free for hosts:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>10.0.1.0/24
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>00001010.00000000.00000001 | 00000000
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>├── 24 bits: LOCKED ──────┤ ├ 8 bits: FREE ┤
+</code></pre></div>
+<p>With 8 free bits, each bit can be 0 or 1, so we get 2^8 = <strong>256 possible addresses</strong>
+(from <code>10.0.1.0</code> through <code>10.0.1.255</code>).</p>
+<p>This is the default "small subnet" in most networks. We'll see it used for individual subnets
+like our web, app, and data tiers in the spoke VNets.</p>
+<h4 id="16-a-large-network">/16 - a large network<a class="headerlink" href="#16-a-large-network" title="Permanent link">&para;</a></h4>
+<p>A <code>/16</code> locks only 16 bits, leaving 16 bits free:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>10.0.0.0/16
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>00001010.00000000 | 00000001.00000000
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>├─ 16 bits: LOCKED ┤ ├─ 16 bits: FREE ─┤
+</code></pre></div>
+<p>16 free bits gives us 2^16 = <strong>65,536 addresses</strong> (from <code>10.0.0.0</code> through <code>10.0.255.255</code>).</p>
+<p>This is why we use <code>/16</code> for each VNet's overall address space - it gives us plenty of room
+to carve out many subnets inside it without ever running out of addresses.</p>
+<h4 id="26-a-smaller-subnet">/26 - a smaller subnet<a class="headerlink" href="#26-a-smaller-subnet" title="Permanent link">&para;</a></h4>
+<p>A <code>/26</code> locks 26 bits, leaving only 6 bits free:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>10.0.1.0/26
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>00001010.00000000.00000001.00 | 000000
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>├──── 26 bits: LOCKED ───────┤ ├ 6 FREE ┤
+</code></pre></div>
+<p>6 free bits gives us 2^6 = <strong>64 addresses</strong> (from <code>10.0.1.0</code> through <code>10.0.1.63</code>).</p>
+<p>We use <code>/26</code> for subnets like Azure Firewall and Azure Bastion. These services don't need
+hundreds of IPs, so a 64-address block is the right size - large enough to meet Azure's
+minimum requirements, small enough not to waste space.</p>
+<h4 id="27-even-smaller">/27 - even smaller<a class="headerlink" href="#27-even-smaller" title="Permanent link">&para;</a></h4>
+<p>A <code>/27</code> locks 27 bits, leaving just 5 bits free:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>10.0.4.0/27
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>00001010.00000000.00000100.000 | 00000
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>├───── 27 bits: LOCKED ───────┤ ├ 5 FREE ┤
+</code></pre></div>
+<p>5 free bits gives us 2^5 = <strong>32 addresses</strong> (from <code>10.0.4.0</code> through <code>10.0.4.31</code>).</p>
+<p>We use <code>/27</code> for the GatewaySubnet. Azure requires this subnet to exist for VPN or
+ExpressRoute gateways, but it only needs a small number of IPs.</p>
+<h4 id="the-formula">The formula<a class="headerlink" href="#the-formula" title="Permanent link">&para;</a></h4>
+<p>There's one formula that covers all cases:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Total addresses = 2 ^ (32 - prefix length)
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Usable in Azure = total - 5     (because Azure reserves 5 per subnet)
+</code></pre></div>
+<p>Here's a quick reference table:</p>
+<table>
+<thead>
+<tr>
+<th>CIDR</th>
+<th>Calculation</th>
+<th>Total Addresses</th>
+<th>Usable in Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/16</td>
+<td>2^(32-16) = 2^16</td>
+<td>65,536</td>
+<td>65,531</td>
+</tr>
+<tr>
+<td>/24</td>
+<td>2^(32-24) = 2^8</td>
+<td>256</td>
+<td>251</td>
+</tr>
+<tr>
+<td>/26</td>
+<td>2^(32-26) = 2^6</td>
+<td>64</td>
+<td>59</td>
+</tr>
+<tr>
+<td>/27</td>
+<td>2^(32-27) = 2^5</td>
+<td>32</td>
+<td>27</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key insight:</strong> a bigger number after <code>/</code> means more bits are locked for the network,
+which means fewer bits are free for hosts, which means a <strong>smaller</strong> network.
+Conversely, a smaller prefix like <code>/16</code> gives us a much larger address space.</p>
+<p>That's all CIDR notation is. One formula: <code>2 ^ (32 - n)</code>. Now when we see <code>/26</code> in the
+address map below, we know exactly what it means: 26 bits locked, 6 bits free, 64 total
+addresses, 59 usable in Azure.</p>
+<h3 id="full-address-map">Full Address Map<a class="headerlink" href="#full-address-map" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>VNet</th>
+<th>Address Space</th>
+<th>Subnet</th>
+<th>CIDR</th>
+<th>Usable IPs</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hub</strong></td>
+<td>10.0.0.0/16</td>
+<td>AzureFirewallSubnet</td>
+<td>10.0.1.0/26</td>
+<td>59</td>
+<td>Azure Firewall</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>AzureBastionSubnet</td>
+<td>10.0.2.0/26</td>
+<td>59</td>
+<td>Azure Bastion</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>snet-management</td>
+<td>10.0.3.0/24</td>
+<td>251</td>
+<td>Jumpbox VM, management tools</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>GatewaySubnet</td>
+<td>10.0.4.0/27</td>
+<td>27</td>
+<td>VPN/ExpressRoute (reserved)</td>
+</tr>
+<tr>
+<td><strong>Spoke Prod</strong></td>
+<td>10.1.0.0/16</td>
+<td>snet-web</td>
+<td>10.1.1.0/24</td>
+<td>251</td>
+<td>Web frontends</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>snet-app</td>
+<td>10.1.2.0/24</td>
+<td>251</td>
+<td>Application/API tier</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>snet-data</td>
+<td>10.1.3.0/24</td>
+<td>251</td>
+<td>Databases, Private Endpoints</td>
+</tr>
+<tr>
+<td><strong>Spoke Dev</strong></td>
+<td>10.2.0.0/16</td>
+<td>snet-web</td>
+<td>10.2.1.0/24</td>
+<td>251</td>
+<td>Web frontends</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>snet-app</td>
+<td>10.2.2.0/24</td>
+<td>251</td>
+<td>Application/API tier</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>snet-data</td>
+<td>10.2.3.0/24</td>
+<td>251</td>
+<td>Databases, Private Endpoints</td>
+</tr>
+</tbody>
+</table>
+<h3 id="why-azure-reserves-5-ips-per-subnet">Why Azure reserves 5 IPs per subnet<a class="headerlink" href="#why-azure-reserves-5-ips-per-subnet" title="Permanent link">&para;</a></h3>
+<p>In every subnet, Azure reserves the first 4 and last 1 addresses:
+- <code>.0</code> - Network address
+- <code>.1</code> - Default gateway
+- <code>.2</code>, <code>.3</code> - Azure DNS mapping
+- Last IP - Broadcast address</p>
+<p>So a /24 (256 addresses) gives us 251 usable. A /26 (64 addresses) gives 59.</p>
+<h2 id="traffic-flow">Traffic Flow<a class="headerlink" href="#traffic-flow" title="Permanent link">&para;</a></h2>
+<h3 id="spoke-to-internet-outbound">Spoke-to-Internet (Outbound)<a class="headerlink" href="#spoke-to-internet-outbound" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>VM in spoke → spoke VNet → peering → hub VNet → Azure Firewall → Internet
+</code></pre></div>
+<p>The firewall inspects outbound traffic, applying application rules (URL filtering)
+and network rules. All outbound traffic is logged.</p>
+<h3 id="internet-to-spoke-inbound">Internet-to-Spoke (Inbound)<a class="headerlink" href="#internet-to-spoke-inbound" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Internet → Firewall Public IP → DNAT rule → Firewall → peering → spoke VNet → Web VM
+</code></pre></div>
+<p>The firewall performs Destination NAT (DNAT): it translates its public IP to the
+private IP of the web server. This way, web servers never have a public IP.</p>
+<h3 id="spoke-to-spoke">Spoke-to-Spoke<a class="headerlink" href="#spoke-to-spoke" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>VM in spoke-prod → peering → hub → Azure Firewall → hub → peering → spoke-dev VM
+</code></pre></div>
+<p>Spokes cannot talk directly. All cross-spoke traffic routes through the hub firewall.
+This is intentional - the firewall enforces that prod can't accidentally access dev, etc.</p>
+<h3 id="management-access-bastion">Management Access (Bastion)<a class="headerlink" href="#management-access-bastion" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Admin browser → Azure Portal → Bastion → private connection → VM in any VNet
+</code></pre></div>
+<p>No RDP/SSH exposed to the internet. The VM has no public IP. Bastion handles the
+secure tunnel through the Azure backbone.</p>
+<h2 id="dns-resolution-strategy">DNS Resolution Strategy<a class="headerlink" href="#dns-resolution-strategy" title="Permanent link">&para;</a></h2>
+<p>For this landing zone, we use Azure's built-in DNS (168.63.129.16). Each VNet
+automatically resolves Azure resource names.</p>
+<p>For Private Endpoints (e.g., Key Vault), we'll add Private DNS Zones linked to
+the hub VNet. This ensures that <code>kv-prod-001.vault.azure.net</code> resolves
+to the private IP instead of the public IP.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://www.linkedin.com/in/adam-bouafia" target="_blank" rel="noopener" title="Adam Bouafia on LinkedIn" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://adam-bouafia.github.io/" target="_blank" rel="noopener" title="Adam Bouafia Portfolio" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "content.tabs.link", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

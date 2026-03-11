@@ -1,0 +1,1876 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A production Azure Landing Zone built in Bicep, documented as a learning guide for Azure infrastructure.">
+      
+      
+        <meta name="author" content="Adam Bouafia">
+      
+      
+      
+        <link rel="prev" href="../troubleshooting/">
+      
+      
+        <link rel="next" href="../screenshots-gallery/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>Resource Inventory - Azure Landing Zone</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#resource-inventory" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Azure Landing Zone" class="md-header__button md-logo" aria-label="Azure Landing Zone" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Azure Landing Zone
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Resource Inventory
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../network-design/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tagging-strategy/" class="md-tabs__link">
+          
+  
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../deployment-guide/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Azure Landing Zone" class="md-nav__button md-logo" aria-label="Azure Landing Zone" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Azure Landing Zone
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../network-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../naming-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming Convention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stack-decisions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap-construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tagging-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tagging Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../azure-policies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Azure Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ci-cd-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resource Inventory
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resource Inventory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-resource-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Resource List
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hub-vnet-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hub VNet Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hub VNet Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subnets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Subnets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#peerings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peerings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-resources-detail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Resources Detail
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Resources Detail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azure-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#firewall-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall Policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-bastion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Bastion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jumpbox-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jumpbox VM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-vault" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Vault
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log-analytics-workspaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Analytics Workspaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recovery-services-vaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recovery Services Vaults
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nsg-audit-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NSG Audit Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../screenshots-gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Screenshots Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-resource-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Resource List
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hub-vnet-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hub VNet Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hub VNet Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#subnets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Subnets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#peerings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peerings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-resources-detail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Resources Detail
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Resources Detail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azure-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Firewall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#firewall-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Firewall Policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-bastion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Bastion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jumpbox-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jumpbox VM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-vault" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Vault
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log-analytics-workspaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Analytics Workspaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recovery-services-vaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recovery Services Vaults
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nsg-audit-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NSG Audit Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="resource-inventory">Resource Inventory<a class="headerlink" href="#resource-inventory" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>After deploying both the <strong>dev</strong> and <strong>prod</strong> environments, the project landing zone contains
+<strong>32 Azure resources</strong> spread across <strong>4 resource groups</strong> (plus one extra, <code>NetworkWatcherRG</code>,
+that Azure creates automatically for network diagnostics).</p>
+<p>This page is the single source of truth for what got deployed. If someone asks "what's running
+in our subscription?", point them here. Every resource follows the
+<a href="../naming-strategy/">naming convention</a>, and the data below was captured directly from the Azure
+portal and from the automated NSG audit script.</p>
+<p><img alt="All Resources" src="../screenshots/portal-all-resources-list.png" /></p>
+<hr />
+<h2 id="resource-groups">Resource Groups<a class="headerlink" href="#resource-groups" title="Permanent link">&para;</a></h2>
+<p>A <strong>resource group</strong> is a container that holds related Azure resources. Think of it like a folder
+on a computer - it doesn't do anything by itself, but it organizes everything inside it so we can
+manage, monitor, and delete resources as a unit.</p>
+<p>Our landing zone uses four resource groups, each with a clear purpose:</p>
+<table>
+<thead>
+<tr>
+<th>Resource Group</th>
+<th>Purpose</th>
+<th>Environment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rg-hub-weu</code></td>
+<td>Hub VNet, Firewall, Bastion, Jumpbox VM</td>
+<td>Shared/Prod</td>
+</tr>
+<tr>
+<td><code>rg-shared-weu</code></td>
+<td>Key Vault, Log Analytics, Recovery Vault, Storage, Monitoring</td>
+<td>Shared</td>
+</tr>
+<tr>
+<td><code>rg-spoke-dev-weu</code></td>
+<td>Dev spoke VNet and NSGs</td>
+<td>Development</td>
+</tr>
+<tr>
+<td><code>rg-spoke-prod-weu</code></td>
+<td>Prod spoke VNet and NSGs</td>
+<td>Production</td>
+</tr>
+<tr>
+<td><code>NetworkWatcherRG</code></td>
+<td>Auto-created by Azure for network diagnostics</td>
+<td>System</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Why is there a <code>NetworkWatcherRG</code>?</strong> Azure automatically provisions a Network Watcher
+resource in every region where we deploy VNets. It places this watcher in a resource group
+called <code>NetworkWatcherRG</code>. We did not create it - Azure did - but it shows up in the
+subscription, so it is documented here for completeness.</p>
+</blockquote>
+<p><img alt="Resource Groups" src="../screenshots/portal-resource-groups-list.png" /></p>
+<hr />
+<h2 id="complete-resource-list">Complete Resource List<a class="headerlink" href="#complete-resource-list" title="Permanent link">&para;</a></h2>
+<p>The table below lists every resource deployed by our Bicep templates, sorted alphabetically.
+The <strong>Name</strong> column follows our naming convention (<code>{prefix}-{workload}-{env}-{region}</code>), the
+<strong>Type</strong> column shows the Azure resource type, and the <strong>Resource Group</strong> column shows which
+container the resource lives in.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Resource Group</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>afw-hub-weu</code></td>
+<td>Firewall</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>afwp-hub-weu</code></td>
+<td>Firewall Policy</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>ag-infra-alerts</code></td>
+<td>Action group</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>alert-vm-cpu-high</code></td>
+<td>Metric alert rule</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>alert-vm-disk-high</code></td>
+<td>Metric alert rule</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>alert-vm-memory-low</code></td>
+<td>Metric alert rule</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>bas-hub-weu</code></td>
+<td>Bastion</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>kv-alz-dev-001</code></td>
+<td>Key vault</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>log-alz-dev</code></td>
+<td>Log Analytics workspace</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>log-alz-prod</code></td>
+<td>Log Analytics workspace</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>NetworkWatcher_westeurope</code></td>
+<td>Network Watcher</td>
+<td><code>NetworkWatcherRG</code></td>
+</tr>
+<tr>
+<td><code>nic-vm-jump-hub-001</code></td>
+<td>Network Interface</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>nsg-app-dev</code></td>
+<td>Network security group</td>
+<td><code>rg-spoke-dev-weu</code></td>
+</tr>
+<tr>
+<td><code>nsg-app-prod</code></td>
+<td>Network security group</td>
+<td><code>rg-spoke-prod-weu</code></td>
+</tr>
+<tr>
+<td><code>nsg-data-dev</code></td>
+<td>Network security group</td>
+<td><code>rg-spoke-dev-weu</code></td>
+</tr>
+<tr>
+<td><code>nsg-data-prod</code></td>
+<td>Network security group</td>
+<td><code>rg-spoke-prod-weu</code></td>
+</tr>
+<tr>
+<td><code>nsg-management-hub</code></td>
+<td>Network security group</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>nsg-web-dev</code></td>
+<td>Network security group</td>
+<td><code>rg-spoke-dev-weu</code></td>
+</tr>
+<tr>
+<td><code>nsg-web-prod</code></td>
+<td>Network security group</td>
+<td><code>rg-spoke-prod-weu</code></td>
+</tr>
+<tr>
+<td><code>osdisk-vm-jump-hub-001</code></td>
+<td>Disk</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>pip-afw-hub-weu</code></td>
+<td>Public IP address</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>pip-bas-hub-weu</code></td>
+<td>Public IP address</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>rsv-alz-dev</code></td>
+<td>Recovery Services vault</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>rsv-alz-prod</code></td>
+<td>Recovery Services vault</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>stdiagalzdev001</code></td>
+<td>Storage account</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>stdiagalzprod001</code></td>
+<td>Storage account</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>vm-jump-hub-001</code></td>
+<td>Virtual machine</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>VMInsights(log-alz-dev)</code></td>
+<td>Solution</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>VMInsights(log-alz-prod)</code></td>
+<td>Solution</td>
+<td><code>rg-shared-weu</code></td>
+</tr>
+<tr>
+<td><code>vnet-hub-weu</code></td>
+<td>Virtual network</td>
+<td><code>rg-hub-weu</code></td>
+</tr>
+<tr>
+<td><code>vnet-spoke-dev-weu</code></td>
+<td>Virtual network</td>
+<td><code>rg-spoke-dev-weu</code></td>
+</tr>
+<tr>
+<td><code>vnet-spoke-prod-weu</code></td>
+<td>Virtual network</td>
+<td><code>rg-spoke-prod-weu</code></td>
+</tr>
+</tbody>
+</table>
+<p>That is <strong>32 resources</strong> in total. Notice how every name makes its purpose obvious - we can tell
+at a glance that <code>afw-hub-weu</code> is the Azure Firewall in the hub, deployed to West Europe, and
+<code>nsg-web-prod</code> is the Network Security Group protecting the web subnet in production.</p>
+<hr />
+<h2 id="hub-vnet-details">Hub VNet Details<a class="headerlink" href="#hub-vnet-details" title="Permanent link">&para;</a></h2>
+<p>The hub VNet (<code>vnet-hub-weu</code>) is the central point of the entire network. All traffic between
+spokes flows through it, and it hosts the shared networking services - Firewall, Bastion, and
+the management jumpbox.</p>
+<h3 id="subnets">Subnets<a class="headerlink" href="#subnets" title="Permanent link">&para;</a></h3>
+<p>A subnet is a smaller network carved out of the VNet's address space. Each subnet serves a
+specific purpose and has its own security rules. Here is what the hub contains:</p>
+<table>
+<thead>
+<tr>
+<th>Subnet</th>
+<th>Address Prefix</th>
+<th>Connected Device</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AzureFirewallSubnet</code></td>
+<td><code>10.0.1.0/26</code></td>
+<td><code>afw-hub-weu</code> (Firewall, IP: <code>10.0.1.4</code>)</td>
+</tr>
+<tr>
+<td><code>AzureBastionSubnet</code></td>
+<td><code>10.0.2.0/26</code></td>
+<td><code>bas-hub-weu</code> (Bastion)</td>
+</tr>
+<tr>
+<td><code>snet-management</code></td>
+<td><code>10.0.3.0/24</code></td>
+<td><code>nic-vm-jump-hub-001</code> (IP: <code>10.0.3.4</code>)</td>
+</tr>
+<tr>
+<td><code>GatewaySubnet</code></td>
+<td><code>10.0.4.0/27</code></td>
+<td>Reserved for future VPN/ExpressRoute</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Why the small /26 and /27 ranges?</strong> Azure Firewall and Bastion each need a dedicated subnet
+but don't consume many IPs. A <code>/26</code> gives 64 addresses, which is more than enough. The
+<code>GatewaySubnet</code> uses <code>/27</code> (32 addresses) because Azure VPN Gateway requires at least that
+size. We keep these subnets small to preserve address space for workloads.</p>
+</blockquote>
+<p><img alt="Hub VNet Capabilities" src="../screenshots/portal-hub-vnet-overview-capabilities.png" /></p>
+<p><img alt="Hub VNet Connected Devices" src="../screenshots/portal-hub-vnet-connected-devices.png" /></p>
+<p><img alt="Hub VNet Address Space" src="../screenshots/portal-hub-vnet-address-space-peerings.png" /></p>
+<h3 id="peerings">Peerings<a class="headerlink" href="#peerings" title="Permanent link">&para;</a></h3>
+<p><strong>VNet peering</strong> connects two VNets so resources in each can communicate directly over Azure's
+backbone network (no public internet involved). The hub is peered with both spokes:</p>
+<table>
+<thead>
+<tr>
+<th>Peering Name</th>
+<th>Remote VNet</th>
+<th>Address Space</th>
+<th>State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>peer-vnet-hub-weu-to-vnet-spoke-prod-weu</code></td>
+<td><code>vnet-spoke-prod-weu</code></td>
+<td><code>10.1.0.0/16</code></td>
+<td>Connected, Fully Synchronized</td>
+</tr>
+<tr>
+<td><code>peer-vnet-hub-weu-to-vnet-spoke-dev-weu</code></td>
+<td><code>vnet-spoke-dev-weu</code></td>
+<td><code>10.2.0.0/16</code></td>
+<td>Connected, Fully Synchronized</td>
+</tr>
+</tbody>
+</table>
+<p>The state <strong>Connected, Fully Synchronized</strong> means both sides of the peering are active and
+routing tables have been exchanged. If this ever shows <code>Disconnected</code>, traffic between the
+hub and that spoke will stop flowing.</p>
+<blockquote>
+<p><strong>Important:</strong> The spokes are never peered directly to each other. All inter-spoke traffic
+goes through the hub's Azure Firewall. This is by design - it gives us a single inspection
+point for all east-west traffic.</p>
+</blockquote>
+<p><img alt="Peering Status" src="../screenshots/portal-hub-vnet-peering-prod-connected.png" /></p>
+<hr />
+<h2 id="key-resources-detail">Key Resources Detail<a class="headerlink" href="#key-resources-detail" title="Permanent link">&para;</a></h2>
+<h3 id="azure-firewall">Azure Firewall<a class="headerlink" href="#azure-firewall" title="Permanent link">&para;</a></h3>
+<p>The <strong>Azure Firewall</strong> (<code>afw-hub-weu</code>) is the central security appliance in the hub-spoke
+topology. All traffic between spokes and all outbound internet traffic passes through it,
+giving us a single point to inspect, log, and filter network traffic.</p>
+<ul>
+<li><strong>SKU:</strong> Standard</li>
+<li><strong>Private IP:</strong> <code>10.0.1.4</code></li>
+<li><strong>Public IP:</strong> <code>pip-afw-hub-weu</code></li>
+<li><strong>Policy:</strong> <code>afwp-hub-weu</code></li>
+</ul>
+<p><img alt="Firewall Overview" src="../screenshots/portal-firewall-overview.png" /></p>
+<h3 id="firewall-policy">Firewall Policy<a class="headerlink" href="#firewall-policy" title="Permanent link">&para;</a></h3>
+<p>The <strong>Firewall Policy</strong> (<code>afwp-hub-weu</code>) defines what traffic the firewall allows or denies.
+Rather than configuring rules directly on the firewall, Azure uses a separate policy resource.
+This makes it easy to share one policy across multiple firewalls if the environment grows.</p>
+<ul>
+<li><strong>Network rules:</strong> 3 rules (controlling traffic between subnets)</li>
+<li><strong>Application rules:</strong> 2 rules (controlling outbound internet access by FQDN)</li>
+<li><strong>Threat intelligence mode:</strong> Alert (logs suspicious traffic but does not block it)</li>
+</ul>
+<p><img alt="Firewall Policy" src="../screenshots/portal-firewall-policy-properties.png" /></p>
+<h3 id="azure-bastion">Azure Bastion<a class="headerlink" href="#azure-bastion" title="Permanent link">&para;</a></h3>
+<p><strong>Azure Bastion</strong> (<code>bas-hub-weu</code>) provides secure RDP and SSH access to virtual machines
+without exposing them to the public internet. Instead of connecting to a public IP on the VM,
+we connect through the Azure portal, and Bastion brokers the session over TLS.</p>
+<ul>
+<li><strong>Tier:</strong> Basic</li>
+<li><strong>Subnet:</strong> <code>AzureBastionSubnet</code> (<code>10.0.2.0/26</code>)</li>
+<li><strong>Public IP:</strong> <code>pip-bas-hub-weu</code></li>
+</ul>
+<p>This is why the jumpbox VM has no public IP - Bastion handles all remote access.</p>
+<p><img alt="Bastion" src="../screenshots/portal-bastion-overview.png" /></p>
+<h3 id="jumpbox-vm">Jumpbox VM<a class="headerlink" href="#jumpbox-vm" title="Permanent link">&para;</a></h3>
+<p>The <strong>Jumpbox</strong> (<code>vm-jump-hub-001</code>) is a management virtual machine in the hub's management
+subnet. Administrators connect to it through Bastion, and from there they can reach resources
+in any spoke. It is the only VM in the entire landing zone.</p>
+<ul>
+<li><strong>Size:</strong> Standard B2s v2 (2 vCPUs, 4 GB RAM - sufficient for management tasks)</li>
+<li><strong>OS:</strong> Windows Server 2022</li>
+<li><strong>Private IP:</strong> <code>10.0.3.4</code></li>
+<li><strong>NIC:</strong> <code>nic-vm-jump-hub-001</code></li>
+<li><strong>OS Disk:</strong> <code>osdisk-vm-jump-hub-001</code></li>
+<li><strong>NSG:</strong> <code>nsg-management-hub</code> (allows only RDP and SSH from the Bastion subnet)</li>
+</ul>
+<p><img alt="Jumpbox VM" src="../screenshots/portal-jumpbox-vm-overview.png" /></p>
+<h3 id="key-vault">Key Vault<a class="headerlink" href="#key-vault" title="Permanent link">&para;</a></h3>
+<p><strong>Azure Key Vault</strong> (<code>kv-alz-dev-001</code>) stores secrets, certificates, and encryption keys. In
+this landing zone it holds the jumpbox admin password and any other sensitive values that should
+not be stored in plain text.</p>
+<ul>
+<li><strong>Access model:</strong> RBAC (Role-Based Access Control, the modern approach - not the legacy access
+  policies)</li>
+<li><strong>Soft delete:</strong> Enabled (deleted secrets are recoverable for 90 days)</li>
+<li><strong>Purge protection:</strong> Enabled (prevents permanent deletion even by admins)</li>
+</ul>
+<p><img alt="Key Vault" src="../screenshots/portal-keyvault-overview.png" /></p>
+<h3 id="log-analytics-workspaces">Log Analytics Workspaces<a class="headerlink" href="#log-analytics-workspaces" title="Permanent link">&para;</a></h3>
+<p><strong>Log Analytics</strong> is where all diagnostic logs, metrics, and security events are collected. We
+deploy two workspaces to keep dev and prod telemetry separate:</p>
+<ul>
+<li><code>log-alz-dev</code> - collects logs from development resources</li>
+<li><code>log-alz-prod</code> - collects logs from production resources</li>
+</ul>
+<p>Both use the <strong>Pay-as-we-go</strong> pricing tier, which means we only pay for the data ingested.
+The <strong>VMInsights</strong> solutions (<code>VMInsights(log-alz-dev)</code> and <code>VMInsights(log-alz-prod)</code>) are
+automatically added to enable performance monitoring and dependency mapping for VMs.</p>
+<p><img alt="Log Analytics" src="../screenshots/portal-log-analytics-overview.png" /></p>
+<h3 id="recovery-services-vaults">Recovery Services Vaults<a class="headerlink" href="#recovery-services-vaults" title="Permanent link">&para;</a></h3>
+<p><strong>Recovery Services Vaults</strong> provide backup and disaster recovery for Azure resources. Like
+Log Analytics, we deploy one per environment:</p>
+<ul>
+<li><code>rsv-alz-dev</code> - backup vault for development resources</li>
+<li><code>rsv-alz-prod</code> - backup vault for production resources</li>
+</ul>
+<p>These vaults are pre-provisioned and ready to protect VMs, databases, and file shares as
+workloads are added to the spokes.</p>
+<p><img alt="Recovery Vault" src="../screenshots/portal-recovery-services-vault-prod.png" /></p>
+<hr />
+<h2 id="nsg-audit-results">NSG Audit Results<a class="headerlink" href="#nsg-audit-results" title="Permanent link">&para;</a></h2>
+<p><strong>Network Security Groups</strong> (NSGs) are the subnet-level firewalls that control which traffic is
+allowed into and out of each subnet. Our landing zone deploys 7 NSGs in total.</p>
+<p>The automated NSG audit script (<code>scripts/powershell/Invoke-NsgAudit.ps1</code>) scanned all NSGs and
+produced the following summary:</p>
+<ul>
+<li><strong>7 NSGs</strong> deployed across 3 resource groups</li>
+<li><strong>17 custom rules</strong> (rules we defined in our Bicep templates)</li>
+<li><strong>42 default rules</strong> (rules Azure adds automatically to every NSG)</li>
+<li><strong>No rules allowing <code>Any</code> source</strong> - every custom allow rule restricts the source to a
+  specific subnet range</li>
+</ul>
+<p>This is a key compliance finding. Allowing <code>Any</code> as a source address is a common misconfiguration
+that exposes resources to the entire internet. Our NSG rules are properly scoped - for example,
+the web subnet NSGs only allow HTTP/HTTPS traffic from the Firewall subnet (<code>10.0.1.0/26</code>), and
+the data subnet NSGs only allow SQL traffic from the app subnet.</p>
+<p>The full audit output is saved to <code>nsg-audit.csv</code> in the project root.</p>
+<p><img alt="NSG Audit" src="../screenshots/32-cli-nsg-audit-results.png" /></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://www.linkedin.com/in/adam-bouafia" target="_blank" rel="noopener" title="Adam Bouafia on LinkedIn" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://adam-bouafia.github.io/" target="_blank" rel="noopener" title="Adam Bouafia Portfolio" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "content.tabs.link", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

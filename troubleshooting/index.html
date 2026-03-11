@@ -1,0 +1,1869 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A production Azure Landing Zone built in Bicep, documented as a learning guide for Azure infrastructure.">
+      
+      
+        <meta name="author" content="Adam Bouafia">
+      
+      
+      
+        <link rel="prev" href="../deployment-guide/">
+      
+      
+        <link rel="next" href="../resource-inventory/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>Troubleshooting - Azure Landing Zone</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#troubleshooting-errors-we-hit-and-how-we-fixed-them" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Azure Landing Zone" class="md-header__button md-logo" aria-label="Azure Landing Zone" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Azure Landing Zone
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Troubleshooting
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../network-design/" class="md-tabs__link">
+          
+  
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tagging-strategy/" class="md-tabs__link">
+          
+  
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../deployment-guide/" class="md-tabs__link">
+          
+  
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../resource-inventory/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Azure Landing Zone" class="md-nav__button md-logo" aria-label="Azure Landing Zone" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Azure Landing Zone
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../network-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../naming-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming Convention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stack-decisions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap-construction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tagging-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tagging Strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../azure-policies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Azure Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ci-cd-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#round-1-local-bicep-build-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round 1: Local Bicep Build Errors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Round 1: Local Bicep Build Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-1-bcp165-scope-mismatch-in-peering-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 1: BCP165 - Scope Mismatch in Peering Module
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-2-unused-parameter-in-alertsbicep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 2: Unused Parameter in alerts.bicep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-3-hardcoded-urls-in-firewallbicep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 3: Hardcoded URLs in firewall.bicep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-4-bcp318-nullable-resource-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 4: BCP318 - Nullable Resource Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-5-missing-secure-decorator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 5: Missing @secure() Decorator
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#round-2-azure-api-validation-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round 2: Azure API Validation Errors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Round 2: Azure API Validation Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-6-bcp258-missing-parameter-in-bicepparam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 6: BCP258 - Missing Parameter in .bicepparam
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-7-unused-parameters-in-peeringbicep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 7: Unused Parameters in peering.bicep
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#round-3-deployment-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round 3: Deployment Errors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Round 3: Deployment Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-8-missingsubscriptionregistration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 8: MissingSubscriptionRegistration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-9-firewallpolicyapplicationruleinvalidtargetfqdn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 9: FirewallPolicyApplicationRuleInvalidTargetFqdn
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-10-skunotavailable-standard_b2s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 10: SkuNotAvailable - Standard_B2s
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#round-4-post-deployment-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round 4: Post-Deployment Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Round 4: Post-Deployment Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#issue-11-resourcegroupnotfound-labresourcegroup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 11: ResourceGroupNotFound - LabResourceGroup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-12-get-aznetworksecuritygroup-not-recognized" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 12: Get-AzNetworkSecurityGroup Not Recognized
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lessons-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lessons Learned
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-inventory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resource Inventory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../screenshots-gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Screenshots Gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#round-1-local-bicep-build-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round 1: Local Bicep Build Errors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Round 1: Local Bicep Build Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-1-bcp165-scope-mismatch-in-peering-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 1: BCP165 - Scope Mismatch in Peering Module
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-2-unused-parameter-in-alertsbicep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 2: Unused Parameter in alerts.bicep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-3-hardcoded-urls-in-firewallbicep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 3: Hardcoded URLs in firewall.bicep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-4-bcp318-nullable-resource-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 4: BCP318 - Nullable Resource Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-5-missing-secure-decorator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 5: Missing @secure() Decorator
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#round-2-azure-api-validation-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round 2: Azure API Validation Errors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Round 2: Azure API Validation Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-6-bcp258-missing-parameter-in-bicepparam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 6: BCP258 - Missing Parameter in .bicepparam
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-7-unused-parameters-in-peeringbicep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 7: Unused Parameters in peering.bicep
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#round-3-deployment-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round 3: Deployment Errors
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Round 3: Deployment Errors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#error-8-missingsubscriptionregistration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 8: MissingSubscriptionRegistration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-9-firewallpolicyapplicationruleinvalidtargetfqdn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 9: FirewallPolicyApplicationRuleInvalidTargetFqdn
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-10-skunotavailable-standard_b2s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error 10: SkuNotAvailable - Standard_B2s
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#round-4-post-deployment-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round 4: Post-Deployment Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Round 4: Post-Deployment Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#issue-11-resourcegroupnotfound-labresourcegroup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 11: ResourceGroupNotFound - LabResourceGroup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#issue-12-get-aznetworksecuritygroup-not-recognized" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue 12: Get-AzNetworkSecurityGroup Not Recognized
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lessons-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lessons Learned
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="troubleshooting-errors-we-hit-and-how-we-fixed-them">Troubleshooting - Errors We Hit and How We Fixed Them<a class="headerlink" href="#troubleshooting-errors-we-hit-and-how-we-fixed-them" title="Permanent link">&para;</a></h1>
+<p>Deploying an Azure Landing Zone from scratch is never error-free. This page documents every
+error we encountered across four rounds of debugging, what caused each one, and the exact fix
+we applied. If there is one page in this project worth reading carefully, it is this one - real
+deployments have real problems, and understanding why something broke teaches more than getting
+it right the first time ever could.</p>
+<p>The errors are grouped by the stage in which they appeared:</p>
+<ol>
+<li><strong>Local Bicep build</strong> - caught by our <code>validate-bicep.sh</code> script before anything touches Azure</li>
+<li><strong>Azure API validation</strong> - caught by <code>az deployment sub validate</code> before any resources are created</li>
+<li><strong>Deployment</strong> - only surfaced during an actual <code>az deployment sub create</code></li>
+<li><strong>Post-deployment</strong> - issues found when verifying or operating the deployed resources</li>
+</ol>
+<hr />
+<h2 id="round-1-local-bicep-build-errors">Round 1: Local Bicep Build Errors<a class="headerlink" href="#round-1-local-bicep-build-errors" title="Permanent link">&para;</a></h2>
+<p>These errors were caught by running our local validation script:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>bash<span class="w"> </span>scripts/bash/validate-bicep.sh
+</code></pre></div>
+<p>This script runs <code>az bicep lint</code> and <code>az bicep build</code> against every <code>.bicep</code> file in the project.
+It is fast, free, and catches most syntax and structural problems before we ever talk to Azure.</p>
+<hr />
+<h3 id="error-1-bcp165-scope-mismatch-in-peering-module">Error 1: BCP165 - Scope Mismatch in Peering Module<a class="headerlink" href="#error-1-bcp165-scope-mismatch-in-peering-module" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>A resource&#39;s computed scope &quot;resourceGroup&quot; must match the scope of the Bicep file &quot;resourceGroup&quot;
+</code></pre></div>
+<p><strong>File:</strong> <code>infra/modules/networking/peering.bicep</code></p>
+<p><strong>What happened:</strong></p>
+<p>VNet peering in Azure is a two-sided relationship. If the hub VNet lives in resource group A
+and the spoke VNet lives in resource group B, we need to create a peering resource in both
+resource groups - one pointing hub-to-spoke and one pointing spoke-to-hub.</p>
+<p>Our original <code>peering.bicep</code> module tried to do both sides in a single file. It deployed into
+the hub's resource group but then attempted to create a child resource on the spoke VNet, which
+lives in a different resource group. Bicep does not allow cross-scope child resources within the
+same module - each module can only operate within the scope it was deployed to.</p>
+<p>Think of it like a filing clerk who is assigned to one department. They can file papers in their
+own department's cabinet, but they cannot reach into another department's cabinet from where they
+are standing. They would need a colleague in the other department to do that.</p>
+<p><strong>Fix:</strong></p>
+<p>We split the peering into two separate modules, each deployed to its own resource group:</p>
+<ul>
+<li><code>peering.bicep</code> - creates the hub-to-spoke peering (deployed to the hub resource group)</li>
+<li><code>peering-spoke-to-hub.bicep</code> - creates the spoke-to-hub peering (deployed to the spoke resource group)</li>
+</ul>
+<p>In <code>main.bicep</code>, the orchestrator calls each module with the correct <code>scope:</code> set to the
+appropriate resource group.</p>
+<hr />
+<h3 id="error-2-unused-parameter-in-alertsbicep">Error 2: Unused Parameter in alerts.bicep<a class="headerlink" href="#error-2-unused-parameter-in-alertsbicep" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Parameter &quot;location&quot; is declared but never used
+</code></pre></div>
+<p><strong>File:</strong> <code>infra/modules/monitoring/alerts.bicep</code></p>
+<p><strong>What happened:</strong></p>
+<p>The <code>location</code> parameter was declared at the top of the module, but none of the resources inside
+the module referenced it. Azure Monitor alert rules are global resources - they use
+<code>location: 'global'</code> rather than a specific Azure region. The parameter was simply never needed.</p>
+<p>Bicep treats unused parameters as errors (not just warnings) because they indicate dead code that
+confuses anyone reading the module. If a parameter exists, the reader assumes it matters.</p>
+<p><strong>Fix:</strong></p>
+<p>Removed the unused <code>location</code> parameter from <code>alerts.bicep</code> and removed the corresponding
+<code>location:</code> argument from every place in <code>main.bicep</code> that called the alerts module.</p>
+<hr />
+<h3 id="error-3-hardcoded-urls-in-firewallbicep">Error 3: Hardcoded URLs in firewall.bicep<a class="headerlink" href="#error-3-hardcoded-urls-in-firewallbicep" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>A value of &quot;management.azure.com&quot; is hardcoded - use environment() instead
+</code></pre></div>
+<p><strong>File:</strong> <code>infra/modules/networking/firewall.bicep</code></p>
+<p><strong>What happened:</strong></p>
+<p>The Bicep linter flagged hardcoded Azure management URLs in our firewall FQDN (Fully Qualified
+Domain Name) rules. The linter's reasoning is sound: Azure exists in multiple clouds (public,
+government, China), and each cloud has different hostnames. Hardcoding <code>management.azure.com</code>
+would break in Azure Government where the URL is <code>management.usgovcloudapi.net</code>.</p>
+<p>The linter suggests using <code>environment().resourceManager</code> instead, which returns the correct URL
+for whichever cloud the deployment is running in.</p>
+<p>We initially followed the linter's advice and switched to <code>environment()</code> functions. However,
+this later caused a deployment error (see Error 9 below) because <code>environment().resourceManager</code>
+returns the full URL including the protocol - <code>https://management.azure.com/</code> - while Azure
+Firewall FQDN rules expect just the hostname - <code>management.azure.com</code>.</p>
+<p><strong>Final fix:</strong></p>
+<p>We reverted to plain hostnames and suppressed the linter warning on each line. This is one of
+those cases where the linter rule does not apply to our specific context:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>targetFqdns: [
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  #disable-next-line no-hardcoded-env-urls
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>  &#39;management.azure.com&#39;
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>  #disable-next-line no-hardcoded-env-urls
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>  &#39;login.microsoftonline.com&#39;
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>]
+</code></pre></div>
+<p>The <code>#disable-next-line</code> comment tells Bicep "yes, we know, and we have a good reason." This is
+preferable to disabling the rule project-wide, because we still want the linter to catch
+hardcoded URLs elsewhere.</p>
+<hr />
+<h3 id="error-4-bcp318-nullable-resource-access">Error 4: BCP318 - Nullable Resource Access<a class="headerlink" href="#error-4-bcp318-nullable-resource-access" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>The expression of type &quot;resource&quot; may be null. Use non-null assertion (!) to access properties
+</code></pre></div>
+<p><strong>File:</strong> <code>infra/modules/networking/firewall.bicep</code></p>
+<p><strong>What happened:</strong></p>
+<p>The Azure Firewall and its public IP address are conditionally deployed - they only exist when
+<code>deployFirewall</code> is <code>true</code>. This saves significant cost in dev environments (Azure Firewall costs
+approximately EUR 912 per month).</p>
+<p>However, the module's <code>output</code> section tried to read properties from these conditional resources.
+Bicep correctly warns that when <code>deployFirewall</code> is <code>false</code>, these resources will not exist, so
+accessing their properties would fail.</p>
+<p>This is similar to how a programming language warns about potential null pointer exceptions. If a
+variable might not exist, we need to tell the compiler we have handled that case.</p>
+<p><strong>Fix:</strong></p>
+<p>We added the <code>!</code> non-null assertion operator combined with a ternary check:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>output firewallPrivateIp string = deployFirewall ? firewall!.properties.ipConfigurations[0].properties.privateIPAddress : &#39;&#39;
+</code></pre></div>
+<p>This reads as: "If the firewall was deployed, access its private IP (and we promise it is not
+null). Otherwise, return an empty string." The <code>!</code> after <code>firewall</code> is the non-null assertion  - 
+it tells Bicep "trust me, if we got past the <code>deployFirewall</code> check, this resource exists."</p>
+<hr />
+<h3 id="error-5-missing-secure-decorator">Error 5: Missing @secure() Decorator<a class="headerlink" href="#error-5-missing-secure-decorator" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Parameter name &quot;secretsOfficerObjectId&quot; suggests it may contain sensitive data - add @secure()
+</code></pre></div>
+<p><strong>File:</strong> <code>infra/modules/security/keyvault.bicep</code></p>
+<p><strong>What happened:</strong></p>
+<p>Bicep's linter scans parameter names for keywords that suggest sensitive data - words like
+"secret", "password", "key", and "token". The parameter <code>secretsOfficerObjectId</code> triggered this
+rule because of the word "secrets" in its name.</p>
+<p>When a parameter is marked <code>@secure()</code>, Bicep ensures its value is never logged in deployment
+outputs or visible in the Azure portal's deployment history. This is important for passwords and
+connection strings. In our case, the value is just an Azure AD object ID (a GUID), which is not
+truly sensitive - but following the linter's advice is harmless and keeps our code consistent.</p>
+<p><strong>Fix:</strong></p>
+<p>Added the <code>@secure()</code> decorator above the parameter declaration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>@secure()
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>param secretsOfficerObjectId string
+</code></pre></div>
+<hr />
+<h2 id="round-2-azure-api-validation-errors">Round 2: Azure API Validation Errors<a class="headerlink" href="#round-2-azure-api-validation-errors" title="Permanent link">&para;</a></h2>
+<p>These errors were caught by running validation against the Azure API:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>az<span class="w"> </span>deployment<span class="w"> </span>sub<span class="w"> </span>validate<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--location<span class="w"> </span>westeurope<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--template-file<span class="w"> </span>infra/main.bicep<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--parameters<span class="w"> </span>infra/main.dev.bicepparam<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span>--parameters<span class="w"> </span><span class="nv">jumpboxAdminPassword</span><span class="o">=</span><span class="s1">&#39;ValidationOnly123!&#39;</span>
+</code></pre></div>
+<p>This command sends our compiled template to Azure for validation without creating any resources.
+Azure checks things that the local linter cannot - like whether resource types exist, whether API
+versions are valid, and whether parameter files are complete.</p>
+<hr />
+<h3 id="error-6-bcp258-missing-parameter-in-bicepparam">Error 6: BCP258 - Missing Parameter in .bicepparam<a class="headerlink" href="#error-6-bcp258-missing-parameter-in-bicepparam" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>The following parameters are declared in the Bicep file but missing in the params file: &quot;jumpboxAdminPassword&quot;
+</code></pre></div>
+<p><strong>What happened:</strong></p>
+<p>This is a subtle but important distinction in Bicep parameter files. When a <code>.bicepparam</code> file
+uses the <code>using</code> keyword to reference a <code>.bicep</code> file, it must provide values for ALL parameters
+declared in that Bicep file. We cannot mix <code>.bicepparam</code> with CLI <code>--parameters</code> overrides - the
+two approaches are mutually exclusive.</p>
+<p>We were trying to pass <code>jumpboxAdminPassword</code> via the CLI while providing all other parameters
+through the <code>.bicepparam</code> file. Bicep rejected this because the <code>.bicepparam</code> file claims to be
+the complete source of parameter values (via the <code>using</code> keyword), but it was missing one.</p>
+<p><strong>Fix:</strong></p>
+<p>We added <code>readEnvironmentVariable()</code> to both parameter files so the password comes from an
+environment variable at deployment time:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>param jumpboxAdminPassword = readEnvironmentVariable(&#39;JUMPBOX_ADMIN_PASSWORD&#39;)
+</code></pre></div>
+<p>Before deploying, we set the environment variable:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">JUMPBOX_ADMIN_PASSWORD</span><span class="o">=</span><span class="s1">&#39;YourStrongPassword123!&#39;</span>
+</code></pre></div>
+<p>This approach keeps the password out of source code and out of CLI history, which is good
+security practice. The password only exists in the shell session's memory.</p>
+<hr />
+<h3 id="error-7-unused-parameters-in-peeringbicep">Error 7: Unused Parameters in peering.bicep<a class="headerlink" href="#error-7-unused-parameters-in-peeringbicep" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<p>Warnings about <code>hubVnetId</code>, <code>spokeResourceGroupName</code>, and <code>useRemoteGateways</code> being declared but
+never used.</p>
+<p><strong>What happened:</strong></p>
+<p>When we split the peering module into two files in Round 1 (Error 1), we removed the
+spoke-to-hub logic from <code>peering.bicep</code> but forgot to remove the parameters that only the
+spoke-to-hub side needed. These orphaned parameters were left behind like tools on a workbench
+after the job that needed them moved to a different room.</p>
+<p><strong>Fix:</strong></p>
+<p>Removed the unused parameters from <code>peering.bicep</code> and cleaned up all the corresponding
+arguments at every call site in <code>main.bicep</code>. This is a common follow-up task after any
+refactoring - always check for leftover references.</p>
+<hr />
+<h2 id="round-3-deployment-errors">Round 3: Deployment Errors<a class="headerlink" href="#round-3-deployment-errors" title="Permanent link">&para;</a></h2>
+<p>These errors only appeared during an actual deployment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>az<span class="w"> </span>deployment<span class="w"> </span>sub<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>--location<span class="w"> </span>westeurope<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>--template-file<span class="w"> </span>infra/main.bicep<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span>--parameters<span class="w"> </span>infra/main.dev.bicepparam
+</code></pre></div>
+<p>Local validation and API validation both passed, but the real deployment hit issues that can only
+be discovered when Azure actually tries to create resources.</p>
+<hr />
+<h3 id="error-8-missingsubscriptionregistration">Error 8: MissingSubscriptionRegistration<a class="headerlink" href="#error-8-missingsubscriptionregistration" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>The subscription is not registered to use namespace &#39;Microsoft.Network&#39;
+</code></pre></div>
+<p><strong>What happened:</strong></p>
+<p>Azure organizes its services into "resource providers" - <code>Microsoft.Network</code> handles VNets and
+firewalls, <code>Microsoft.Compute</code> handles VMs, <code>Microsoft.KeyVault</code> handles key vaults, and so on.
+A subscription must explicitly register each provider before it can create resources of that type.</p>
+<p>Brand new subscriptions (or lab/sandbox subscriptions) often have very few providers registered
+by default. When our deployment tried to create a VNet, Azure said "I do not know what
+Microsoft.Network is" because that provider was not registered.</p>
+<p>Think of it like enabling features on a phone plan. The phone can technically make international
+calls, but the carrier needs to enable that feature on the account first.</p>
+<p><strong>Fix:</strong></p>
+<p>We registered all the resource providers our landing zone needs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>az<span class="w"> </span>provider<span class="w"> </span>register<span class="w"> </span>--namespace<span class="w"> </span>Microsoft.Network
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>az<span class="w"> </span>provider<span class="w"> </span>register<span class="w"> </span>--namespace<span class="w"> </span>Microsoft.Compute
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>az<span class="w"> </span>provider<span class="w"> </span>register<span class="w"> </span>--namespace<span class="w"> </span>Microsoft.KeyVault
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>az<span class="w"> </span>provider<span class="w"> </span>register<span class="w"> </span>--namespace<span class="w"> </span>Microsoft.RecoveryServices
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>az<span class="w"> </span>provider<span class="w"> </span>register<span class="w"> </span>--namespace<span class="w"> </span>Microsoft.OperationalInsights
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>az<span class="w"> </span>provider<span class="w"> </span>register<span class="w"> </span>--namespace<span class="w"> </span>Microsoft.Insights
+</code></pre></div>
+<p>Registration takes a minute or two per provider. We can check the status with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>az<span class="w"> </span>provider<span class="w"> </span>show<span class="w"> </span>--namespace<span class="w"> </span>Microsoft.Network<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;registrationState&quot;</span>
+</code></pre></div>
+<p>It should return <code>"Registered"</code> when ready.</p>
+<hr />
+<h3 id="error-9-firewallpolicyapplicationruleinvalidtargetfqdn">Error 9: FirewallPolicyApplicationRuleInvalidTargetFqdn<a class="headerlink" href="#error-9-firewallpolicyapplicationruleinvalidtargetfqdn" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>Target FQDN &#39;https://management.azure.com/&#39; is invalid
+</code></pre></div>
+<p><strong>What happened:</strong></p>
+<p>This is the follow-up to Error 3. After the linter told us to use <code>environment().resourceManager</code>
+instead of hardcoded hostnames, we dutifully made the change. The linter was happy. Local
+validation passed. API validation passed.</p>
+<p>But when Azure Firewall actually tried to apply the rule, it rejected the value. Here is why:</p>
+<ul>
+<li><code>environment().resourceManager</code> returns <code>https://management.azure.com/</code> (full URL with protocol
+  and trailing slash)</li>
+<li>Azure Firewall FQDN rules expect just the hostname: <code>management.azure.com</code> (no protocol, no
+  trailing slash)</li>
+</ul>
+<p>These are different formats for different purposes. An FQDN rule matches DNS names, not full URLs.
+Including <code>https://</code> in an FQDN rule is like putting a street name where a city name is expected.</p>
+<p><strong>Fix:</strong></p>
+<p>We reverted to plain hostnames with linter suppression (see Error 3 for the final code). This is
+a good example of why automated tools should be trusted but verified - the linter gave advice
+that was correct in general but wrong for this specific resource type.</p>
+<hr />
+<h3 id="error-10-skunotavailable-standard_b2s">Error 10: SkuNotAvailable - Standard_B2s<a class="headerlink" href="#error-10-skunotavailable-standard_b2s" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>The requested VM size Standard_B2s is not available in westeurope
+</code></pre></div>
+<p><strong>What happened:</strong></p>
+<p>Azure VM sizes (called SKUs) are not available in every region at all times. Microsoft
+periodically retires older SKUs and replaces them with newer versions. The <code>Standard_B2s</code> SKU
+had been retired or restricted in the West Europe region by the time we deployed.</p>
+<p>This is one of those errors that works fine for months and then suddenly fails when Microsoft
+updates their infrastructure. It is not a code error - it is an availability issue.</p>
+<p><strong>Fix:</strong></p>
+<p>First, we checked which B2-series SKUs were available in our region:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>az<span class="w"> </span>vm<span class="w"> </span>list-skus<span class="w"> </span>--location<span class="w"> </span>westeurope<span class="w"> </span>--size<span class="w"> </span>Standard_B2<span class="w"> </span>--output<span class="w"> </span>table
+</code></pre></div>
+<p>This showed that <code>Standard_B2s_v2</code> was available. We updated the default VM size in
+<code>vm-jumpbox.bicep</code> and the corresponding value in <code>main.bicep</code>.</p>
+<p>The lesson here is to always verify SKU availability before choosing a VM size, especially when
+deploying to a new region or after a long gap between deployments.</p>
+<hr />
+<h2 id="round-4-post-deployment-issues">Round 4: Post-Deployment Issues<a class="headerlink" href="#round-4-post-deployment-issues" title="Permanent link">&para;</a></h2>
+<p>These issues appeared after the infrastructure was successfully deployed, while verifying and
+operating the environment.</p>
+<hr />
+<h3 id="issue-11-resourcegroupnotfound-labresourcegroup">Issue 11: ResourceGroupNotFound - LabResourceGroup<a class="headerlink" href="#issue-11-resourcegroupnotfound-labresourcegroup" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>Resource group &#39;LabResourceGroup&#39; could not be found
+</code></pre></div>
+<p><strong>What happened:</strong></p>
+<p>After deployment, we ran <code>az network vnet list</code> to verify our VNets were created. The command
+returned an error about a resource group we never created called <code>LabResourceGroup</code>.</p>
+<p>The problem is that <code>az network vnet list</code> without a <code>--resource-group</code> flag queries ALL
+resource groups in the subscription. If the subscription has stale or orphaned resource groups
+from previous lab exercises or Azure Sandbox environments, the CLI will try to query those too  - 
+and fail if they are in a broken state.</p>
+<p>This is not a problem with our deployment. It is a problem with how we queried Azure.</p>
+<p><strong>Fix:</strong></p>
+<p>Always scope list commands to a specific resource group:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Wrong - queries all resource groups, including stale ones</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>az<span class="w"> </span>network<span class="w"> </span>vnet<span class="w"> </span>list<span class="w"> </span>--output<span class="w"> </span>table
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Right - scoped to the resource group we care about</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>az<span class="w"> </span>network<span class="w"> </span>vnet<span class="w"> </span>list<span class="w"> </span>--resource-group<span class="w"> </span>rg-hub-weu<span class="w"> </span>--output<span class="w"> </span>table
+</code></pre></div>
+<p>This is a good habit in general. Scoped queries are faster, return less noise, and avoid errors
+from unrelated resources in the subscription.</p>
+<hr />
+<h3 id="issue-12-get-aznetworksecuritygroup-not-recognized">Issue 12: Get-AzNetworkSecurityGroup Not Recognized<a class="headerlink" href="#issue-12-get-aznetworksecuritygroup-not-recognized" title="Permanent link">&para;</a></h3>
+<p><strong>Error message:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>The term &#39;Get-AzNetworkSecurityGroup&#39; is not recognized
+</code></pre></div>
+<p><strong>What happened:</strong></p>
+<p>We tried to run the NSG audit script (<code>scripts/powershell/Invoke-NsgAudit.ps1</code>), but PowerShell
+did not recognize the <code>Get-AzNetworkSecurityGroup</code> cmdlet. This cmdlet comes from the <strong>Az
+PowerShell module</strong>, which is separate from both PowerShell itself and the Azure CLI.</p>
+<p>Having Azure CLI installed does not mean the Az PowerShell module is installed - they are
+completely independent tools that happen to manage the same platform. Azure CLI is a standalone
+program (<code>az</code>). The Az PowerShell module is a set of cmdlets that run inside PowerShell (<code>pwsh</code>).</p>
+<p><strong>Fix:</strong></p>
+<p>Install the Az PowerShell module:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>pwsh<span class="w"> </span>-Command<span class="w"> </span><span class="s2">&quot;Install-Module -Name Az -Scope CurrentUser -Force&quot;</span>
+</code></pre></div>
+<p>This installs the module for the current user only (<code>-Scope CurrentUser</code>), which does not require
+administrator privileges. The <code>-Force</code> flag skips confirmation prompts.</p>
+<p>After installation, the NSG audit script runs successfully:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>pwsh<span class="w"> </span>scripts/powershell/Invoke-NsgAudit.ps1<span class="w"> </span>-OutputPath<span class="w"> </span>./nsg-audit.csv
+</code></pre></div>
+<hr />
+<h2 id="lessons-learned">Lessons Learned<a class="headerlink" href="#lessons-learned" title="Permanent link">&para;</a></h2>
+<p>These twelve errors taught us several principles that apply to any Azure deployment:</p>
+<ol>
+<li>
+<p><strong>Always validate locally first.</strong> Running <code>validate-bicep.sh</code> catches most errors in seconds
+   and costs nothing. Do not skip this step.</p>
+</li>
+<li>
+<p><strong>Then validate against the Azure API.</strong> The local linter cannot check whether resource types
+   exist, whether API versions are valid, or whether parameter files are complete.
+   <code>az deployment sub validate</code> catches these.</p>
+</li>
+<li>
+<p><strong>Register resource providers early.</strong> Before the first deployment to a new subscription, register
+   all the providers the project needs. This avoids confusing errors during deployment.</p>
+</li>
+<li>
+<p><strong>Scope CLI commands to specific resource groups.</strong> Always use <code>--resource-group</code> on list commands.
+   Unscoped queries are slower and can fail on stale resources.</p>
+</li>
+<li>
+<p><strong>Test <code>environment()</code> function outputs.</strong> Functions like <code>environment().resourceManager</code> return
+   full URLs with protocols, not bare hostnames. Always verify what a function actually returns
+   before using it in a context that expects a specific format.</p>
+</li>
+<li>
+<p><strong>Check VM SKU availability.</strong> VM sizes get retired over time. Always verify availability with
+   <code>az vm list-skus</code> before choosing a size, especially after a gap between deployments.</p>
+</li>
+<li>
+<p><strong>Read error messages carefully.</strong> Azure error messages are verbose but usually tell us exactly
+   what went wrong. The error <code>Target FQDN 'https://management.azure.com/' is invalid</code> tells us
+   the value includes a protocol that should not be there - if we read it closely enough.</p>
+</li>
+<li>
+<p><strong>Clean up after refactoring.</strong> When we split a module or move logic between files, always check
+   for orphaned parameters, unused variables, and stale references at call sites.</p>
+</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://www.linkedin.com/in/adam-bouafia" target="_blank" rel="noopener" title="Adam Bouafia on LinkedIn" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://adam-bouafia.github.io/" target="_blank" rel="noopener" title="Adam Bouafia Portfolio" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "content.code.copy", "content.tabs.link", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
