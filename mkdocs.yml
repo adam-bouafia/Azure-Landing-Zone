@@ -29,6 +29,8 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
+copyright: Built by Adam Bouafia
+
 extra:
   social:
     - icon: fontawesome/brands/linkedin
